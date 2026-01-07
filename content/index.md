@@ -1,6 +1,5 @@
 ---
-title: Welcome to Quartz
+title: Fusion Atlas 个人博客
 ---
 
-This is a blank Quartz installation.
-See the [documentation](https://quartz.jzhao.xyz) for how to get started.
+Stay Fearful, Stay Minute.
