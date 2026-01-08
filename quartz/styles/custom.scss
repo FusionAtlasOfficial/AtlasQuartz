@@ -1,3 +1,37 @@
 @use "./base.scss";
 
 // put your custom CSS here!
+
+/* 修改左上角站点标题的颜色 */
+
+.page-title a {
+  /* 基础设置 */
+  display: inline-block;
+  background: linear-gradient(90deg, #00d4ff, #0078d2, #0078d2, #a4d4ea);
+  background-size: 300% auto; /* 放大背景，为流动腾出空间 */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  /* 定义平滑的过渡动画 */
+  transition: all 0.4s ease;
+
+  /* === 2. 大小与粗细 === */
+  // font-size 控制文字大小 (默认大概是 1.5rem 左右)
+  font-size: 3.0rem !important; 
+  // font-weight 控制粗细 (400是正常, 700是粗体)
+  font-weight: 400 !important;
+
+}
+
+/* 鼠标悬停时的变化 */
+.page-title a:hover {
+  // 1. 让背景位置发生移动，产生流动感
+  background-position: right center; 
+  
+  // 2. 配合轻微放大
+  transform: scale(1.08); 
+  
+  // 3. 加上淡淡的发光滤镜
+  filter: drop-shadow(0 0 8px rgba(51, 51, 255, 0.4));
+}
