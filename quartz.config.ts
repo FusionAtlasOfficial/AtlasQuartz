@@ -8,7 +8,7 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "The Atlas Knapsack",
+    pageTitle: "Cyber Atlantis",
     pageTitleSuffix: "FusionAtlas",
     enableSPA: true,
     enablePopovers: true,
