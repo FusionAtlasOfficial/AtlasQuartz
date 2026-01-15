@@ -117,78 +117,32 @@ header {
     display: none; /* Chrome/Safari */
   }
 }  
-
-/* --- 目录 (TOC) 最终解决方案 --- */
-
-// 1. 强制右侧边栏按照垂直列排列，确保 Backlinks 在 TOC 下方
-.sidebar.right {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  gap: 1.5rem !important;
-}
-
+  // 右侧边栏内目录
 .sidebar.right .toc {
-  // 取消 TOC 整体的高度限制
-  max-height: none !important;
-  overflow: visible !important;
-
-  // 这里的 button 是你看到 SVG 的那个按钮
-  #toc-button {
-    display: flex !important;
-    align-items: center;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    
-    // 当按钮带有 collapsed 类时，旋转图标（可选，增加视觉反馈）
-    &.collapsed svg {
-      transform: rotate(-90deg);
-      transition: transform 0.2s ease;
-    }
-  }
-
-  // 这是核心：控制内容显示与隐藏
-  #toc-content {
-    // 默认状态：因为你要去滚动条，所以展开时必须是 none + visible
-    &:not(.collapsed) {
-      display: block !important;
-      max-height: none !important;
-      overflow: visible !important;
+  max-height: none !important;  // 核心：取消高度限制
+  overflow: visible !important; // 核心：内容溢出也不要剪裁，直接撑开父容器
+  height: auto !important;      // 确保自适应高度
+  // 针对 TOC 下所有的链接，不分层级
+a {
+  color: rgb(212, 212, 212) !important; // 强制统一颜色
+  opacity: 1 !important;                // 核心：去除半透明变暗效果
+  font-weight: 400;                     // 保持字重统一（可选）
+  transition: all 0.2s ease;
+  
+    // 悬停效果
+    &:hover {
+      color: var(--tertiary) !important;
       opacity: 1 !important;
-      visibility: visible !important;
     }
 
-    // 折叠状态：用 display: none 彻底从文档流移除
-    // 这样下方的 Backlinks 才会真正“顶”上来，而不是重叠
-    &.collapsed {
-      display: none !important; // 核心：解决重叠问题的唯一解
-      max-height: 0 !important;
-      overflow: hidden !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
+    // 激活/高亮状态
+    &.in-view {
+      color: rgb(91, 194, 231) !important;
+      font-weight: 600;
+      opacity: 1 !important;
     }
   }
-
-  // 内部列表
-  ul {
-    list-style: none;
-    padding-left: 1rem;
-    margin: 0;
-    // 确保展开时不出现内部滚动条
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  // 链接颜色
-  a {
-    color: rgb(212, 212, 212) !important;
-    &:hover { color: var(--tertiary) !important; }
-    &.in-view { color: rgb(91, 194, 231) !important; font-weight: 600; }
-  }
-}
+}  
   // 右侧边栏内目录子层级
 .sidebar.right .toc ul {
   max-height: none !important;

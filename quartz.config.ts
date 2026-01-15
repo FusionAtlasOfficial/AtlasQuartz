@@ -12,10 +12,8 @@ const config: QuartzConfig = {
     pageTitleSuffix: "FusionAtlas",
     enableSPA: true,
     enablePopovers: true,
-    analytics: {
-      provider: "plausible",
-    },
-    locale: "en-US",
+    analytics: { provider: 'google', tagId: 'YOUR-ID' },
+    locale: "zh-CN",
     baseUrl: "quartz.jzhao.xyz",
     ignorePatterns: ["private", "templates", ".obsidian"],
     defaultDateType: "modified",
@@ -28,28 +26,28 @@ const config: QuartzConfig = {
         body: "Source Sans Pro",
         code: "IBM Plex Mono",
       },
-      colors: {
+      colors: { //Quartz 的默认逻辑是调用 light 调色板；为了实现固定暗色，现已将 light 的配色方案直接改为和 dark 一样。
         lightMode: {
-          light: "#faf8f8",
-          lightgray: "#e5e5e5",
-          gray: "#b8b8b8",
-          darkgray: "#4e4e4e",
-          dark: "#2b2b2b",
-          secondary: "#284b63",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#fff23688",
+          light: "rgb(22, 22, 22) ",              //页面总背景色
+          lightgray: "rgb(0, 120, 210) ",                 //边框色，如搜索框、分割线、侧边栏线条
+          gray: " #646464 ",                      //图谱线条、重边框
+          darkgray: "rgb(212, 212, 212) ",                  //正文文字
+          dark: "rgb(255, 255, 255) ",            //标题、图标、导航栏文字颜色
+          secondary: "rgb(91, 194, 231) ",         //链接颜色、当前图谱节点、主要高亮色
+          tertiary: "rgb(255, 140, 66) ",         // 链接悬停态 (Hover states)、已访问的图谱节点
+          highlight: "rgba(50, 50, 50, 0.2) ",    // 内部链接背景、代码行高亮背景
+          textHighlight: "rgb(162, 255, 0) ",     // Markdown 语法标记的高亮背景
         },
         darkMode: {
-          light: "#161618",
-          lightgray: "#393639",
-          gray: "#646464",
-          darkgray: "#d4d4d4",
-          dark: "#ebebec",
-          secondary: "#7b97aa",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#b3aa0288",
+          light: "rgb(22, 22, 22) ",              //页面总背景色
+          lightgray: " #0078d2 ",                 //边框色，如搜索框、分割线、侧边栏线条
+          gray: " #646464 ",                      //图谱线条、重边框
+          darkgray: " #D4D4D4 ",                  //正文文字
+          dark: "rgb(255, 255, 255) ",            //标题、图标、导航栏文字颜色
+          secondary: "rgb(0, 120, 210) ",         //链接颜色、当前图谱节点、主要高亮色
+          tertiary: "rgb(255, 140, 66) ",         // 链接悬停态 (Hover states)、已访问的图谱节点
+          highlight: "rgba(50, 50, 50, 0.2) ",    // 内部链接背景、代码行高亮背景
+          textHighlight: "rgb(162, 255, 0) ",     // Markdown 语法标记的高亮背景
         },
       },
     },
