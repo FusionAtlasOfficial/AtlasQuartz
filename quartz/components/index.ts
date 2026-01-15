@@ -23,7 +23,6 @@ import Breadcrumbs from "./Breadcrumbs"
 import Comments from "./Comments"
 import Flex from "./Flex"
 import ConditionalRender from "./ConditionalRender"
-import Avatar from "./Avatar"
 
 export {
   ArticleTitle,
@@ -51,5 +50,6 @@ export {
   Comments,
   Flex,
   ConditionalRender,
-  Avatar,
 }
+
+export { default as Avatar } from "./Avatar"

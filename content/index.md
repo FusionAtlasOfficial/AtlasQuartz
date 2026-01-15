@@ -1,10 +1,12 @@
 ---
-title: Welcome to Cyber ​​Atlantis！
+title: 欢迎来到隐域岛
 ---
 
 # 这是什么地方？🤨
 
-嗨！我是 [Atlas](关于我%20Myself/Fusion_Atlas.md)。
+**Hi！Welcome to Cyber ​​Atlantis！**
+
+我是 [Atlas](关于我%20Myself/Fusion_Atlas.md)。
 
 这里是我的个人网站 —— 请坐和放宽 😆 。
 

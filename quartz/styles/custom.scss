@@ -96,7 +96,35 @@ header {
   padding: 1.5rem;                 // 内边距，防止内容贴边
   height: fit-content;             // 根据内容高度调整或固定
 }
-  
+
+/* --- 左侧头像样式优化 --- */
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+  margin-bottom: 0.5rem;
+
+  a {
+    text-decoration: none;
+    border: none;
+    display: block; // 确保链接撑满容器
+    
+    &:hover .avatar-img {
+      transform: scale(1.1); // 悬停稍微放大
+      box-shadow: 0 0 15px var(--secondary); // 增加发光效果
+    }
+  }
+}
+
+.avatar-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: all 0.3s ease;
+  cursor: pointer; // 强制显示小手光标
+}
+
   // 右侧边栏
 .sidebar.right {
   background-color: #161617;
@@ -117,98 +145,100 @@ header {
     display: none; /* Chrome/Safari */
   }
 }  
-
-/* --- 目录 (TOC) 最终解决方案 --- */
-
-// 1. 强制右侧边栏按照垂直列排列，确保 Backlinks 在 TOC 下方
-.sidebar.right {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  gap: 1.5rem !important;
-}
-
+  // 右侧边栏内目录（动态 ID 兼容修复方案）
 .sidebar.right .toc {
-  // 取消 TOC 整体的高度限制
+  // 1. 容器本身不限高
   max-height: none !important;
   overflow: visible !important;
 
-  // 这里的 button 是你看到 SVG 的那个按钮
-  #toc-button {
-    display: flex !important;
-    align-items: center;
-    cursor: pointer;
+  // 2. 针对按钮样式（你看到的那个带有 .collapsed 的元素）
+  .toc-header {
     background: transparent;
     border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
     
-    // 当按钮带有 collapsed 类时，旋转图标（可选，增加视觉反馈）
+    // 旋转图标
     &.collapsed svg {
       transform: rotate(-90deg);
+    }
+    svg {
       transition: transform 0.2s ease;
     }
   }
 
-  // 这是核心：控制内容显示与隐藏
-  #toc-content {
-    // 默认状态：因为你要去滚动条，所以展开时必须是 none + visible
-    &:not(.collapsed) {
-      display: block !important;
-      max-height: none !important;
-      overflow: visible !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-
-    // 折叠状态：用 display: none 彻底从文档流移除
-    // 这样下方的 Backlinks 才会真正“顶”上来，而不是重叠
-    &.collapsed {
-      display: none !important; // 核心：解决重叠问题的唯一解
-      max-height: 0 !important;
-      overflow: hidden !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-  }
-
-  // 内部列表
-  ul {
-    list-style: none;
-    padding-left: 1rem;
-    margin: 0;
-    // 确保展开时不出现内部滚动条
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  // 链接颜色
-  a {
-    color: rgb(212, 212, 212) !important;
-    &:hover { color: var(--tertiary) !important; }
-    &.in-view { color: rgb(91, 194, 231) !important; font-weight: 600; }
-  }
-}
-  // 右侧边栏内目录子层级
-.sidebar.right .toc ul {
-  max-height: none !important;
-  overflow: visible !important;
-  // 目录列表基础重置
-  ul {
-    opacity: 1 !important; // 确保容器本身也没有透明度
-    padding-left: 1rem;    // 保持缩进，用物理距离代替颜色深浅来区分层级
-  }
-}
-
-    // 4. 中间内容区
-  .center {
-    box-sizing: border-box; // 核心：强制内敛计算宽度
-    background-color: #161617;
-    border: 1px solid #2d2d2e;
-    padding: 2rem; 
+  /* --- 核心修复：使用相邻兄弟选择器覆盖动态 ID --- */
   
-    // 确保宽度不会超过 Grid 容器分配给它的空间
-    width: 100%; 
-    max-width: 100%; 
-    overflow: hidden; // 防止内部某些代码块或图片溢出
+  // A. 【展开状态】：只有当按钮不含 .collapsed 时，才应用“去滚动条”规则
+  // 使用 [id^="toc-"] 匹配任何以 toc- 开头的 ID (如 toc-2, toc-content)
+  .toc-header:not(.collapsed) + div[id^="toc-"],
+  .toc-header:not(.collapsed) + #toc-content {
+    display: block !important;
+    max-height: none !important;  // 关键：允许撑开，消除内部滚动条
+    overflow: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  // B. 【折叠状态】：当按钮包含 .collapsed 时，强制内容彻底消失
+  .toc-header.collapsed + div[id^="toc-"],
+  .toc-header.collapsed + #toc-content {
+    display: none !important;     // 关键：彻底移除占位，让下方的 Backlinks 顶上来
+    max-height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+
+  // 3. 链接与列表美化
+  ul, li {
+    opacity: 1 !important;
+    background: transparent !important;
+  }
+
+  // 统一链接的默认颜色
+  a {
+    // 确保所有未激活的链接都是你设定的亮灰色
+    color: rgb(212, 212, 212) !important; 
+    opacity: 1 !important;
+    transition: color 0.2s ease, transform 0.2s ease;
+
+    // 悬停效果：保持发光感
+    &:hover {
+      color: var(--tertiary) !important; 
+      transform: translateX(4px); // 增加微小的右移效果，增强交互感
+    }
+
+    // 正在阅读的部分（激活态）
+    &.in-view {
+      color: rgb(91, 194, 231) !important; // 亮蓝色高亮
+      font-weight: 600;
+      opacity: 1 !important;
+    }
+  }
+}
+
+// 4. 强制右边栏子元素（TOC 和 Backlinks）按顺序排列
+.sidebar.right {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2rem !important;
+  // 隐藏侧边栏自身的原生滚动条（保持简洁）
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+  // 4. 中间内容区
+.center {
+  box-sizing: border-box; // 核心：强制内敛计算宽度
+  background-color: #161617;
+  border: 1px solid #2d2d2e;
+  padding: 2rem; 
+
+  // 确保宽度不会超过 Grid 容器分配给它的空间
+  width: 100%; 
+  max-width: 100%; 
+  overflow: hidden; // 防止内部某些代码块或图片溢出
   }
