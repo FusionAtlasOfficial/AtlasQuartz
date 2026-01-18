@@ -4,10 +4,50 @@ import * as Component from "./quartz/components"
 // components shared across all pages
 export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
+  // === Header 配置：分离 Desktop 和 Mobile 布局 ===
   header: [
-    Component.DesktopOnly(Component.PageTitle()), // 将标题设置到顶栏左侧(仅桌面模式)
-    Component.Search(), // 将搜索设置到顶栏(仅桌面模式)
-  ],  afterBody: [],
+    // 1. 桌面端布局
+    Component.DesktopOnly(
+      Component.Flex({
+        components: [
+          { Component: Component.PageTitle() },
+          { 
+            Component: Component.Links({
+              links: {
+                "首页": "/",
+                "归档": "/tags",
+                "关于": "/about",
+                "项目": "/projects",
+                "导航": "/navigation",
+              }
+            }) 
+          },
+          // --- 新增：签名组件 (紧接在链接后面) ---
+          { 
+            Component: Component.Signature({ 
+              text: "—— Every Hero Has a Code" // 在这里修改你的签名文本
+            }) 
+          },
+          // ------------------------------------
+          { Component: Component.Search() }, // 直接放置，靠右逻辑交给 CSS
+        ],
+        gap: "large",
+      })
+    ),
+
+    // 2. 移动端布局 (Mobile Only)
+    Component.MobileOnly(
+      Component.Flex({
+        components: [
+          { Component: Component.PageTitle() },
+          { Component: Component.Search() },
+        ],
+        gap: "small",
+      })
+    ),
+  ],
+  // ==========================
+  afterBody: [],
   footer: Component.Footer({
     links: {
       GitHub: "https://github.com/jackyzha0/quartz",
@@ -28,21 +68,11 @@ export const defaultContentPageLayout: PageLayout = {
     Component.TagList(),
   ],
   left: [
-//    Component.PageTitle(),
+    // Component.PageTitle(),
     Component.Avatar(), // 自定义头像
-    Component.MobileOnly(Component.Flex({
-      components: [
-        { Component: Component.PageTitle() },
-//        {
-//          Component: Component.Search(),
-//          grow: true,
-//        },
-//        { Component: Component.Darkmode() },
-//        { Component: Component.ReaderMode() },
-      ],
-    })),
+
     Component.Explorer({
-//    Component.DesktopOnly(Component.Explorer({
+      // Component.DesktopOnly(Component.Explorer({
       title: "所有文章", // 将默认的 Explorer 改为 目录
       folderClickBehavior: "collapse", // 点击文件夹的行为（折叠或跳转）
       folderDefaultState: "collapsed", // 默认展开还是折叠

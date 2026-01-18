@@ -35,30 +35,110 @@
   filter: drop-shadow(0 0 8px rgba(51, 51, 255, 0.4));
 }
 
+/* --- 全局顶部横幅布局方案 --- */
+/* === 1. Header 基础容器 === */
 header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between; // 让标题和搜索/深色模式分布在两端
-  gap: 1.5rem;
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 2px solid var(--lightgray); // 添加一条底边线线
-  margin-bottom: 1rem;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 80px;
+  z-index: 1000;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(22, 22, 22, 0.85) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--lightgray);
+}
 
-  // 让搜索组件的包装容器撑开
-  .search {
-    flex-grow: 1; 
-    max-width: 200px; // 或者你期望的最大宽度
-  }
+/* === 2. 桌面端布局修复 (暴力覆盖) === */
 
-  // 让搜索按钮（那个长条输入框外形的按钮）撑开
-  .search-button {
-    width: 100%;
-    max-width: none; // 覆盖默认的限制
-    display: flex;
-    justify-content: flex-start;
+/* 2.1 强制桌面端容器撑开 */
+header > .desktop-only {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* 2.2 核心：Quartz Flex 容器及其直接子代 div */
+header .desktop-only.flex-component {
+  width: 100% !important;
+  max-width: 1600px !important;
+  padding: 0 2rem !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important; /* 所有东西默认靠左 */
+  gap: 2.5rem !important; /* 统一设置左侧元素间距 */
+}
+
+/* 2.3 强制重置 Quartz 为每个组件生成的包裹 div */
+header .desktop-only.flex-component > div {
+  flex: 0 0 auto !important; /* 默认不伸缩 */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  /* 移除内联 style 可能存在的 center 对齐 */
+  margin: 0 !important; 
+}
+
+/* 2.4 【终极方案】让 Search 所在的那个 div 占据所有剩余空间 */
+/* 我们使用通配符匹配包含 search 的包装层 */
+header .desktop-only.flex-component > div:has(.search) {
+  flex: 1 1 auto !important; /* 关键：占据中间所有空隙 */
+  margin-left: 0 !important;
+  justify-content: flex-end !important; /* 强制其内部的搜索按钮靠右 */
+}
+
+/* 2.5 内部组件微调 */
+.page-title.desktop-only {
+  margin: 0 !important;
+  font-size: 2.2rem !important;
+  white-space: nowrap;
+}
+
+.nav-links.desktop-only {
+  display: flex !important;
+  gap: 1.5rem !important;
+  a {
+    white-space: nowrap;
+    color: var(--darkgray);
+    text-decoration: none;
+    font-weight: 500;
+    &:hover { color: var(--tertiary); }
   }
+}
+
+.signature.desktop-only {
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--gray);
+    white-space: nowrap;
+    opacity: 0.8;
+  }
+}
+
+/* === 3. 移动端独立样式 (Mobile) === */
+header > .mobile-only.flex-component {
+  width: 100% !important;
+  padding: 0 1rem !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+/* === 4. 页面主体下移避开 Header === */
+.page > .center, 
+.page > .left, 
+.page > .right {
+  padding-top: 80px !important;
 }
 
 // 强制设置颜色方案为暗色
@@ -230,7 +310,7 @@ header {
   &::-webkit-scrollbar { display: none; }
 }
 
-  // 4. 中间内容区
+// 中间内容区
 .center {
   box-sizing: border-box; // 核心：强制内敛计算宽度
   background-color: #161617;
@@ -242,3 +322,50 @@ header {
   max-width: 100%; 
   overflow: hidden; // 防止内部某些代码块或图片溢出
   }
+
+// 中间内容区（移动端优化）
+// 使用媒体查询针对移动端（通常是 800px 以下）进行覆盖
+@media all and (max-width: 800px) {
+  .center {
+    padding: 0.5rem !important; // 减少移动端内边距
+    border: none !important;    // 移动端去掉边框以节省空间
+    background-color: transparent !important; // 移动端保持纯黑
+    
+    // 针对 center 内部的 article 标题等进行缩小
+    article h1 {
+      font-size: 1.8rem !important;
+      margin-top: 1rem !important;
+    }
+  }
+}
+
+/* 单独调整文章标题（文件名）的样式 */
+.article-title {
+  // 1. 字号调整：默认 h1 约为 2rem，你可以设置为更大以超过正文标题
+  font-size: 2.8rem !important; 
+  
+  // 2. 颜色调整：可以使用 CSS 变量，也可以直接设置颜色
+  // 建议使用 var(--secondary) 保持风格统一，或直接指定颜色代码
+  color: var(--lightgray) !important; 
+  
+  // 3. 增加发光效果 (Text Shadow)
+  // 第一层: 较窄的半透明投影，增强字体边缘亮感
+  // 第二层: 较宽的低透明度投影，模拟柔和的光晕扩散
+  text-shadow: 
+    0 0 05px rgba(0, 255, 217, 0.1), 
+    0 0 10px rgba(255, 255, 255, 0.05) !important;
+
+  // 4. 间距与字体微调
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  
+  // 5. 添加渐变效果，呼应你的站点标题
+  background: linear-gradient(90deg, rgb(0, 120, 210), rgb(91, 194, 231));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 如果你希望文章内的 # 一级标题保持原样，
+   这种写法只会影响顶部自动生成的那个文件名标题 */
