@@ -1,50 +1,47 @@
 import { PageLayout, SharedLayout } from "./quartz/cfg"
 import * as Component from "./quartz/components"
 
-// components shared across all pages
+// 全局共有：搜索、标题、深色模式、页脚
 export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
-  // === Header 配置：分离 Desktop 和 Mobile 布局 ===
+  // === Header 配置：已合并为全局统一布局 ===
   header: [
-    // 1. 桌面端布局
-    Component.DesktopOnly(
-      Component.Flex({
-        components: [
-          { Component: Component.PageTitle() },
-          { 
-            Component: Component.Links({
+    Component.Flex({
+      components: [
+        {
+          Component: Component.Avatar(), // 移动端专用头像组件，桌面端通过custom.scss隐藏
+        },
+        {
+          Component: Component.PageTitle(), // 站点标题
+        },
+        {
+          Component: Component.Links(
+            // 导航链接组件
+            {
               links: {
-                "首页": "/",
-                "归档": "/tags",
-                "关于": "/about",
-                "项目": "/projects",
-                "导航": "/navigation",
-              }
-            }) 
-          },
-          // --- 新增：签名组件 (紧接在链接后面) ---
-          { 
-            Component: Component.Signature({ 
-              text: "—— Every Hero Has a Code" // 在这里修改你的签名文本
-            }) 
-          },
-          // ------------------------------------
-          { Component: Component.Search() }, // 直接放置，靠右逻辑交给 CSS
-        ],
-        gap: "large",
-      })
-    ),
-
-    // 2. 移动端布局 (Mobile Only)
-    Component.MobileOnly(
-      Component.Flex({
-        components: [
-          { Component: Component.PageTitle() },
-          { Component: Component.Search() },
-        ],
-        gap: "small",
-      })
-    ),
+                首页: "/",
+                归档: "/tags",
+                导航: "/navigation",
+                关于: "/about",
+                打钱: "/give me money",
+              },
+            },
+          ),
+        },
+        {
+          Component: Component.Signature(
+            // 签名
+            {
+              text: "—— Every Hero Has a Code", // 签名文本
+            },
+          ),
+        },
+        {
+          Component: Component.Search(), // 搜索栏
+        },
+      ],
+      gap: "large",
+    }),
   ],
   // ==========================
   afterBody: [],
@@ -56,7 +53,7 @@ export const sharedPageComponents: SharedLayout = {
   }),
 }
 
-// components for pages that display a single page (e.g. a single note)
+// 笔记页特有：左边栏显示文件树，右边栏显示目录和反向链接
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
     Component.ConditionalRender({
@@ -68,16 +65,19 @@ export const defaultContentPageLayout: PageLayout = {
     Component.TagList(),
   ],
   left: [
-    // Component.PageTitle(),
-    Component.Avatar(), // 自定义头像
-
+    Component.Avatar(), // 桌面端专用，移动端通过custom.scss隐藏
     Component.Explorer({
-      // Component.DesktopOnly(Component.Explorer({
-      title: "所有文章", // 将默认的 Explorer 改为 目录
+      title: "所有文章", // 将默认的 Explorer 改为 自定义内容
       folderClickBehavior: "collapse", // 点击文件夹的行为（折叠或跳转）
       folderDefaultState: "collapsed", // 默认展开还是折叠
       useSavedState: true, // 是否记住用户的展开状态
     }),
+    Component.MobileOnly(Component.Search()), // 移动端专用：在侧边栏添加搜索框
+    Component.MobileOnly(
+      Component.Signature({
+        text: "—— Every Hero Has a Caade", // 签名文本
+      }),
+    ), // 移动端专用：在侧边栏添加搜索框
   ],
   right: [
     Component.Graph(),
@@ -86,7 +86,7 @@ export const defaultContentPageLayout: PageLayout = {
   ],
 }
 
-// components for pages that display lists of pages  (e.g. tags or folders)
+// 列表页（标签页等）特有：左边栏显示文件树，右边栏通常留空或放简单组件
 export const defaultListPageLayout: PageLayout = {
   beforeBody: [Component.Breadcrumbs(), Component.ArticleTitle(), Component.ContentMeta()],
   left: [
