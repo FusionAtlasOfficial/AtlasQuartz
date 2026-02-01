@@ -50,14 +50,14 @@ const LinkCardsOfficially: QuartzComponent = ({ displayClass }: QuartzComponentP
 
   return (
     <>
-      <div class={`link-cards-container ${displayClass ?? ""}`} style={gridStyle}>
+      <div class={`link-cards-officially-container ${displayClass ?? ""}`} style={gridStyle}>
         {cards.map((card) => (
-          <a href={card.link} class="link-card">
+          <a href={card.link} class="link-card-officially">
           {/* 左侧图标区域 */}
-          <div class="card-icon-wrapper">{card.icon}</div>
+          <div class="card-icon-wrapper-officially">{card.icon}</div>
           
           {/* 右侧文字区域 */}
-          <div class="card-content-wrapper">
+          <div class="card-content-wrapper-officially">
             <h3>{card.title}</h3>
             <p>{card.desc}</p>
           </div>
@@ -74,7 +74,7 @@ const LinkCardsOfficially: QuartzComponent = ({ displayClass }: QuartzComponentP
         window.addEventListener('load', moveCards);
 
         function moveCards() {
-          const cards = document.querySelector('.link-cards-container');
+          const cards = document.querySelector('.link-cards-officially-container');
           const placeholder = document.getElementById('link-cards-Officially-placeholder');
           
           if (cards && placeholder) {
@@ -90,10 +90,10 @@ const LinkCardsOfficially: QuartzComponent = ({ displayClass }: QuartzComponentP
 
 // 这里的 CSS 现在的核心任务是调用 quartz.config.ts 定义的变量
 LinkCardsOfficially.css = `
-.link-cards-container {
+.link-cards-officially-container {
 }
 
-.link-card {
+.link-card-officially {
   display: flex !important;
   flex-direction: row !important; /* 水平排列：图标在左，文字在右 */
   align-items: center;
@@ -113,14 +113,14 @@ LinkCardsOfficially.css = `
 }
 
 /* 悬停动画效果 */
-.link-card:hover {
+.link-card-officially:hover {
   transform: scale(1.02);
   background: rgba(255, 255, 255, 0.05); /* 悬停时的背景色 */
   border-color: var(--tertiary); 
   box-shadow: 0 0 5px var(--tertiary);
 }
 
-.card-icon-wrapper {
+.card-icon-wrapper-officially {
   font-size: 2.2rem;
   margin-right: 1.2rem;
   flex-shrink: 0; /* 防止图标被压缩 */
@@ -133,12 +133,12 @@ LinkCardsOfficially.css = `
   border-radius: 8px;
 }
 
-.card-content-wrapper {
+.card-content-wrapper-officially {
   flex-grow: 1;
   min-width: 0;
 }
 
-.card-content-wrapper h3 {
+.card-content-wrapper-officially h3 {
   margin: 0 0 0.2rem 0 !important;
   font-size: 1.05rem !important;
   font-weight: 700;
@@ -148,11 +148,11 @@ LinkCardsOfficially.css = `
   overflow: hidden;
 }
 
-.link-card:hover .card-content-wrapper h3 {
+.link-card-officially:hover .card-content-wrapper-officially h3 {
   color: var(--tertiary); /* 悬停变为橙色，增加互动感 */
 }
 
-.card-content-wrapper p {
+.card-content-wrapper-officially p {
   margin: 0;
   font-size: 0.9rem;
   color: var(--darkgray);
@@ -173,20 +173,20 @@ LinkCardsOfficially.css = `
   color: var(--tertiary); /* 箭头使用橙色 */
 }
 
-.link-card:hover .card-arrow {
+.link-card-officially:hover .card-arrow {
   opacity: 1;
   transform: translateX(0);
 }
 
 /* 移动端响应式：保证任何时候都是1列 */
 @media (max-width: 1630px) {
-  .link-cards-container {
+  .link-cards-officially-container {
     grid-template-columns: repeat(1, 1fr) !important;
   }
 }
 
 @media (max-width: 800px) {
-  .link-cards-container {
+  .link-cards-officially-container {
     grid-template-columns: 1fr !important;
     gap: 0.8rem;
   }

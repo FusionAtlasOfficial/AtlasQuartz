@@ -56,7 +56,7 @@ const LinkCardsAboutMe: QuartzComponent = ({ displayClass }: QuartzComponentProp
 
   return (
     <>
-      <div class={`link-cards-container ${displayClass ?? ""}`} style={gridStyle}>
+      <div class={`link-cards-aboutme-container ${displayClass ?? ""}`} style={gridStyle}>
         {cards.map((card) => {
           // 判断 icon 的渲染逻辑
           const renderIcon = () => {
@@ -70,11 +70,11 @@ const LinkCardsAboutMe: QuartzComponent = ({ displayClass }: QuartzComponentProp
           };
 
           return (
-            <a href={card.link} class="link-card" target="_blank" rel="noopener noreferrer">
-              <div class="card-icon-wrapper">
+            <a href={card.link} class="link-card-aboutme" target="_blank" rel="noopener noreferrer">
+              <div class="card-icon-wrapper-aboutme">
                 {renderIcon()}
               </div>
-              <div class="card-content-wrapper">
+              <div class="card-content-wrapper-aboutme">
                 <h3>{card.title}</h3>
               </div>
             </a>
@@ -88,7 +88,7 @@ const LinkCardsAboutMe: QuartzComponent = ({ displayClass }: QuartzComponentProp
         window.addEventListener('load', moveCards);
 
         function moveCards() {
-          const cards = document.querySelector('.link-cards-container');
+          const cards = document.querySelector('.link-cards-aboutme-container');
           const placeholder = document.getElementById('link-cards-AboutMe-placeholder');
           
           if (cards && placeholder) {
@@ -105,13 +105,13 @@ const LinkCardsAboutMe: QuartzComponent = ({ displayClass }: QuartzComponentProp
 // 这里的 CSS 现在的核心任务是调用 quartz.config.ts 定义的变量
 LinkCardsAboutMe.css = `
 /* 卡片外层容器 */
-.link-cards-container {
+.link-cards-aboutme-container {
   box-sizing: border-box; /* 确保内边距不影响容器总宽度 */
   margin: 0 auto;         /* 容器自身在父元素中居中 */
 }
 
 /* 单个卡片样式 */
-.link-card {
+.link-card-aboutme {
   display: flex !important;
   flex-direction: column !important; /* 纵向排列：图标在上，文字在下 */
   align-items: center;              /* 水平居中 */
@@ -126,14 +126,14 @@ LinkCardsAboutMe.css = `
 }
 
 /* 卡片悬停 (Hover) 状态 */
-.link-card:hover {
+.link-card-aboutme:hover {
   transform: translateY(-5px);       /* 悬停时向上轻微浮动 5px */
   background: rgba(255, 255, 255, 0.05); /* 悬停时背景色略微变亮 */
   box-shadow: 0 0 5px var(--tertiary);      /* 边框颜色变为主题的第三主色 */
 }
 
 /* 图标容器样式 */
-.card-icon-wrapper {
+.card-icon-wrapper-aboutme {
   margin-bottom: 0.8rem;             /* 图标与标题之间的间距 */
   display: flex;
   align-items: center;
@@ -149,7 +149,7 @@ LinkCardsAboutMe.css = `
 }
 
 /* 针对嵌入式 SVG 的样式 */
-.card-icon-wrapper svg {
+.card-icon-wrapper-aboutme svg {
   width: 60px;
   height: 60px;
   fill: currentColor;                /* 关键：使 SVG 填充颜色继承父级的 color 属性 */
@@ -157,25 +157,25 @@ LinkCardsAboutMe.css = `
 }
 
 /* 图片图标样式 (当 icon 为 URL 时) */
-.card-icon-wrapper img {
+.card-icon-wrapper-aboutme img {
   width: 32px;                        /* 限制图标宽度 */
   height: 32px;                       /* 限制图标高度 */
   object-fit: contain;                /* 保持图片比例 */
 }
 
 /* 文本/Emoji 图标样式 */
-.card-icon-wrapper span {
+.card-icon-wrapper-aboutme span {
   font-size: 2rem;                    /* 增大 Emoji 尺寸 */
 }
 
 /* 悬停时图标的变化：旋转、放大并变色 */
-.link-card:hover .card-icon-wrapper {
+.link-card-aboutme:hover .card-icon-wrapper-aboutme {
   transform: rotate(360deg) scale(1.1);
   color: var(--tertiary);            /* 悬停时，SVG 图标会随之变为高亮色 */
 }
 
 /* 标题样式 */
-.card-content-wrapper h3 {
+.card-content-wrapper-aboutme h3 {
   margin: 0 !important;              /* 移除 Quartz 默认的 h3 边距 */
   font-size: 1rem !important;        /* 设置合适的字号 */
   font-weight: 600;                  /* 加粗字体 */
@@ -184,26 +184,26 @@ LinkCardsAboutMe.css = `
 }
 
 /* 悬停时标题颜色变化 */
-.link-card:hover .card-content-wrapper h3 {
+.link-card-aboutme:hover .card-content-wrapper-aboutme h3 {
   color: var(--tertiary);            /* 悬停时标题变为高亮色 */
 }
 
 /* 移动端/响应式适配 */
 @media (max-width: 1630px) {
-  .link-cards-container {
+  .link-cards-aboutme-container {
     grid-template-columns: repeat(4, 1fr) !important;
   }
 }
 
 @media (max-width: 800px) {
-  .link-cards-container {
+  .link-cards-aboutme-container {
     grid-template-columns: repeat(4, 1fr) !important;
     gap: 0.8rem;
   }
 }
 
 @media (max-width: 600px) {
-  .link-cards-container {
+  .link-cards-aboutme-container {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 0.8rem;
   }

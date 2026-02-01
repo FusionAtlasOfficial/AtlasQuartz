@@ -50,14 +50,14 @@ const LinkCardsHome: QuartzComponent = ({ displayClass }: QuartzComponentProps) 
 
   return (
     <>
-      <div class={`link-cards-container ${displayClass ?? ""}`} style={gridStyle}>
+      <div class={`link-cards-home-container ${displayClass ?? ""}`} style={gridStyle}>
         {cards.map((card) => (
-          <a href={card.link} class="link-card">
+          <a href={card.link} class="link-card-home">
           {/* 左侧图标区域 */}
-          <div class="card-icon-wrapper">{card.icon}</div>
+          <div class="card-icon-wrapper-home">{card.icon}</div>
           
           {/* 右侧文字区域 */}
-          <div class="card-content-wrapper">
+          <div class="card-content-wrapper-home">
             <h3>{card.title}</h3>
             <p>{card.desc}</p>
           </div>
@@ -74,7 +74,7 @@ const LinkCardsHome: QuartzComponent = ({ displayClass }: QuartzComponentProps) 
         window.addEventListener('load', moveCards);
 
         function moveCards() {
-          const cards = document.querySelector('.link-cards-container');
+          const cards = document.querySelector('.link-cards-home-container');
           const placeholder = document.getElementById('link-cards-Home-placeholder');
           
           if (cards && placeholder) {
@@ -90,10 +90,10 @@ const LinkCardsHome: QuartzComponent = ({ displayClass }: QuartzComponentProps) 
 
 // 这里的 CSS 现在的核心任务是调用 quartz.config.ts 定义的变量
 LinkCardsHome.css = `
-.link-cards-container {
+.link-cards-home-container {
 }
 
-.link-card {
+.link-card-home {
   display: flex !important;
   flex-direction: row !important; /* 水平排列：图标在左，文字在右 */
   align-items: center;
@@ -113,14 +113,14 @@ LinkCardsHome.css = `
 }
 
 /* 悬停动画效果 */
-.link-card:hover {
+.link-card-home:hover {
   transform: scale(1.02);
   background: rgba(255, 255, 255, 0.05); /* 悬停时的背景色 */
   border-color: var(--tertiary); 
   box-shadow: 0 0 5px var(--tertiary);
 }
 
-.card-icon-wrapper {
+.card-icon-wrapper-home {
   font-size: 2.2rem;
   margin-right: 1.2rem;
   flex-shrink: 0; /* 防止图标被压缩 */
@@ -133,12 +133,12 @@ LinkCardsHome.css = `
   border-radius: 8px;
 }
 
-.card-content-wrapper {
+.card-content-wrapper-home {
   flex-grow: 1;
   min-width: 0;
 }
 
-.card-content-wrapper h3 {
+.card-content-wrapper-home h3 {
   margin: 0 0 0.2rem 0 !important;
   font-size: 1.05rem !important;
   font-weight: 700;
@@ -148,11 +148,11 @@ LinkCardsHome.css = `
   text-overflow: ellipsis;
 }
 
-.link-card:hover .card-content-wrapper h3 {
+.link-card-home:hover .card-content-wrapper-home h3 {
   color: var(--tertiary); /* 悬停变为橙色，增加互动感 */
 }
 
-.card-content-wrapper p {
+.card-content-wrapper-home p {
   margin: 0;
   font-size: 0.9rem;
   color: var(--darkgray);
@@ -173,20 +173,20 @@ LinkCardsHome.css = `
   color: var(--tertiary); /* 箭头使用橙色 */
 }
 
-.link-card:hover .card-arrow {
+.link-card-home:hover .card-arrow {
   opacity: 1;
   transform: translateX(0);
 }
 
 /* 移动端响应式：屏幕小于 1630px 时强制变为两列，小于 800px 变为一列 */
 @media (max-width: 1630px) {
-  .link-cards-container {
+  .link-cards-home-container {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
 @media (max-width: 800px) {
-  .link-cards-container {
+  .link-cards-home-container {
     grid-template-columns: 1fr !important;
     gap: 0.8rem;
   }
