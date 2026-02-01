@@ -21,11 +21,11 @@ export const sharedPageComponents: SharedLayout = {
             // 导航链接组件
             {
               links: {
-                首页: "./",
-                最新内容: "安卓刷机-Android/Atlas_个人刷机笔记_20260108",
-                笔记杂项: "笔记杂项页",
-                更新日志: "网站更新日志",
-                关于: "关于我-AboutMe",
+                首页: "/",
+                最新内容: "/安卓刷机-Android/Atlas_个人刷机笔记_20260108",
+                笔记杂项: "/笔记杂项页",
+                更新日志: "/网站更新日志",
+                关于: "/关于我-AboutMe",
               },
             },
           ),
@@ -261,7 +261,7 @@ export const defaultListPageLayout: PageLayout = {
       // === 过滤函数：隐藏具体文件的代码 ===
       filterFn: (node: FileTrieNode) => {
         // 隐藏文件（文件名通常不带 .md 后缀，且建议使用小写进行匹配）
-        const hideFiles = new Set(["关于我-aboutme", "网站更新日志"])
+        const hideFiles = new Set(["关于我-aboutme", "网站更新日志", "正式发布页", "笔记杂项页"])
         // 隐藏文件夹
         const hideFolders = new Set(["安卓刷机-android"])
 
@@ -277,8 +277,8 @@ export const defaultListPageLayout: PageLayout = {
       // 排序函数：自定义优先级
       sortFn: (a: FileTrieNode, b: FileTrieNode) => {
         // 1. 文件夹优先于文件
-        if (a.isFolder && !b.isFolder) return -1
-        if (!a.isFolder && b.isFolder) return 1
+        if (a.isFolder && !b.isFolder) return 1
+        if (!a.isFolder && b.isFolder) return -1
 
         // 2. 特殊文件夹置顶 (根据 slugSegment)
         const priorityList = ["游戏攻略", "philosophy", "projects"]
