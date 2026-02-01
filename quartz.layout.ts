@@ -78,6 +78,11 @@ export const defaultContentPageLayout: PageLayout = {
       // 这里的 "正式发布页" 需对应 MD 文件的文件名（slug）
       condition: (page) => page.fileData.slug === "正式发布页",
     }),
+    Component.ConditionalRender({
+      component: Component.LinkCardsAboutMe(),
+      // 这里的 "正式发布页" 需对应 MD 文件的文件名（slug）
+      condition: (page) => page.fileData.slug === "关于我-AboutMe",
+    }),
   ],
   left: [
     Component.Avatar(), // 桌面端专用，移动端通过custom.scss隐藏
