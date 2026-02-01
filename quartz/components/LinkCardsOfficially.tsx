@@ -143,9 +143,9 @@ LinkCardsOfficially.css = `
   font-size: 1.05rem !important;
   font-weight: 700;
   color: var(--secondary);
-  white-space: nowrap;
+  white-space: pre-line; /* 允许手动换行并保留换行符 */
+  word-break: break-word;     /* 确保长单词或中英文混合时能断行 */
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .link-card:hover .card-content-wrapper h3 {
