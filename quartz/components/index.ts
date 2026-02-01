@@ -55,3 +55,5 @@ export {
 export { default as Avatar } from "./Avatar"
 export { default as Links } from "./Links"
 export { default as Signature } from "./Signature"
+export { default as LinkCardsHome } from "./LinkCardsHome"
+export { default as LinkCardsOfficially } from "./LinkCardsOfficially"

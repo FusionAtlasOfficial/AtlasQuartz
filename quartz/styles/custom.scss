@@ -1,11 +1,153 @@
 @use "./base.scss"; // 引入 Quartz 基础样式表
 
 // ==========================================================================
-// 模块 1: 站点标题排版 (Typography - Page Title)
-// 关联组件: quartz.layout.ts 中的 Component.PageTitle()
+// 模块 1: 全局颜色与主题强制 (Colors & Theme)
+// 目标: 无论系统设置如何，强制锁定为暗色模式
 // ==========================================================================
 
-/* === 1.1 站点标题链接样式 === */
+/* === 1.1 强制暗色模式 === */
+:root {
+  color-scheme: dark !important; /* 保留 !important 防止被浏览器或 OS 设置覆盖 */
+}
+
+/* 锁定 CSS 变量：无论 data-theme 是 light 还是 dark，都使用暗色值 */
+:root[data-theme="light"],
+:root[data-theme="dark"] {
+  --light: #161616; // 与 config.ts 中的背景色一致
+  --darkgray: #d4d4d4; // 与 config.ts 中的正文颜色一致
+}
+
+/* 隐藏深色模式切换按钮 (防止用户切换导致闪烁) */
+#darkmode-toggle {
+  display: none;
+}
+
+/* === 1.2 动态流体背景 === */
+
+// 全局降噪：通过叠加一层细微的噪点，打断色彩断层，模拟胶片质感（占用 html::before）
+
+html::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; // 位于内容之下，光斑之上
+  pointer-events: none;
+  // 使用 SVG 生成噪点，比图片加载更快且无损
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+  // 柔光混合模式，使噪点融入深色背景
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+}
+
+body {
+  // 强制背景色为深色，防止加载时闪白，同时作为光斑的底色
+  background-color: rgb(22, 22, 22);
+  background-attachment: fixed; //将背景图像的位置在视口内固定
+}
+
+/* === 借用body的after和before创建伪元素动态色块 === */
+/* === 伪元素动态色块公共属性 === */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+
+  top: 0; /* 核心！定义光斑基准位置，决定后面动画的移动数值 */
+  left: 0; /* 核心！定义光斑基准位置，决定后面动画的移动数值 */
+
+  width: 200vw; /* 保持足够宽，确保动画时不会看到边界，实际大小由动画里的缩放（scale）来定义 */
+  height: 200vw; /* 保持足够高，确保动画时不会看到边界，实际大小由动画里的缩放（scale）来定义 */
+
+  z-index: -2; /* 确保在噪点(z-1)之下，背景之上 */
+  pointer-events: none;
+  mix-blend-mode: screen; /* 让颜色以光的形式叠加，平滑边缘过渡 */
+
+  backface-visibility: hidden; /*强制不裁剪，解决移动端断裂问题*/
+  perspective: 1000;
+}
+
+/* === 蓝色光斑本体 === */
+body::before {
+  background: radial-gradient(
+    /*手动插值渐变色缓解低可用色阶断层问题+性能问题*/ circle at center,
+    rgba(0, 120, 210, 0.6) 0%,
+    rgba(0, 120, 210, 0.45) 15%,
+    rgba(0, 120, 210, 0.25) 35%,
+    rgba(0, 120, 210, 0.12) 48%,
+    rgba(0, 120, 210, 0.05) 60%,
+    rgba(0, 120, 210, 0) 75%
+  );
+
+  animation: fluid-flow-primary 45s infinite linear; /*动画总循环时常*/
+}
+
+/* === 橙色光斑本体 === */
+body::after {
+  background: radial-gradient(
+    /*手动插值渐变色缓解低可用色阶断层问题+性能问题*/ circle at center,
+    rgba(255, 140, 66, 0.5) 0%,
+    rgba(255, 140, 66, 0.35) 15%,
+    rgba(255, 140, 66, 0.18) 35%,
+    rgba(255, 140, 66, 0.08) 48%,
+    rgba(255, 140, 66, 0.03) 60%,
+    rgba(255, 140, 66, 0) 75%
+  );
+
+  animation: fluid-flow-secondary 45s infinite linear; /*动画总循环时常*/
+}
+
+/* === 蓝色光斑 动画 === */
+/* translate(-50%, -50%)是核心，为了让光斑“中心”落在坐标点上，解决屏幕外渲染裁切问题！后面的translate直接坐标意图 */
+@keyframes fluid-flow-primary {
+  0% {
+    transform: translate(-50%, -50%) translate(0, 0) scale(0.5);
+    opacity: 0.5;
+  }
+  33% {
+    transform: translate(-50%, -50%) translate(66.6vw, 33.3vh) scale(1.25);
+    opacity: 0.3;
+  }
+  66% {
+    transform: translate(-50%, -50%) translate(33.3vw, 66.6vh) scale(1.25);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(0, 0) scale(0.5);
+    opacity: 0.5;
+  }
+}
+
+/* === 橙色光斑 动画 === */
+/* translate(-50%, -50%)是核心，为了让光斑“中心”落在坐标点上，解决屏幕外渲染裁切问题！后面的translate直接坐标意图 */
+@keyframes fluid-flow-secondary {
+  0% {
+    transform: translate(-50%, -50%) translate(66.6vw, 33.3vh) scale(0.25);
+    opacity: 0.2;
+  }
+  33% {
+    transform: translate(-50%, -50%) translate(100vw, 100vh) scale(0.5);
+    opacity: 0.6;
+  }
+  66% {
+    transform: translate(-50%, -50%) translate(33.3vw, 66.6vh) scale(0.375);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(66.6vw, 33.3vh) scale(0.25);
+    opacity: 0.2;
+  }
+}
+
+// ==========================================================================
+// 模块 2: 大组件基本定义
+// 关联组件: quartz.layout.ts
+// ==========================================================================
+
+/* === 2.1 站点标题链接定义 === */
+
 .page-title a {
   /* --- 布局与基础 --- */
   display: inline-block; /* 允许 transform 生效 */
@@ -16,6 +158,7 @@
   -webkit-background-clip: text; /* 将背景裁剪为文字形状 (Chrome/Safari) */
   background-clip: text; /* 标准属性 */
   -webkit-text-fill-color: transparent; /* 让文字本身透明，从而透出背景色 */
+  text-shadow: none !important; /* 强制取消背景阴影效果以便不被后续文章内设定所影响 */
 
   /* 定义平滑的过渡动画 */
   transition: all 0.4s ease; // 所有属性变化在 0.4 秒内平滑过渡
@@ -23,26 +166,146 @@
   /* 字体大小与粗细强制覆盖 */
   font-size: 3rem; // font-size 控制文字大小 (默认大概是 1.5rem 左右)
   font-weight: 400; // font-weight 控制粗细 (400是正常, 700是粗体)
+  white-space: nowrap; /* 标题不允许换行 */
+  -webkit-tap-highlight-color: transparent; /* [移动端优化新增] 移除移动端默认的点击高亮色块，使用我们自定义的 active 效果替代 */
 }
 
-/* === 1.2 鼠标悬停站点标题 (Hover) 交互效果 === */
-.page-title a:hover {
-  /* 1. 背景流动: 改变背景定位，产生颜色流动的视觉效果 */
+/* === 2.2 站点标题交互效果优化 (PC/Mobile 分离但视觉一致) === */
+/* 方案 A: 针对 PC 端 (支持精确悬停的设备) - 只有鼠标悬停才触发 */
+@media (hover: hover) and (pointer: fine) {
+  .page-title a:hover {
+    /* 1. 背景流动: 改变背景定位，产生颜色流动的视觉效果 */
+    background-position: right center;
+
+    /* 2. 视觉反馈: 轻微放大 1.08 倍 */
+    transform: scale(1.08);
+
+    /* 3. 光影增强: 添加符合品牌色的蓝色光晕 */
+    filter: drop-shadow(0 0 8px rgba(51, 51, 255, 0.4));
+  }
+}
+
+//* 方案 B: 针对 移动端 (通过 :active 模拟悬停效果) */
+/* 解决问题：使用 :active 替代 :hover，手指抬起即恢复，避免样式卡死 (Sticky Hover) */
+.page-title a:active {
+  /* === 此处复用上方 hover 的效果，确保视觉一致 === */
   background-position: right center;
-
-  /* 2. 视觉反馈: 轻微放大 1.08 倍 */
-  transform: scale(1.08);
-
-  /* 3. 光影增强: 添加符合品牌色的蓝色光晕 */
+  transform: scale(1.08); /* 保持放大，而非缩小的按压感 */
   filter: drop-shadow(0 0 8px rgba(51, 51, 255, 0.4));
+
+  /* 加速过渡，点击通常很短暂，0.1s 的超快过渡能确保用户在跳转前看清“变大/发光”的反馈 */
+  transition-duration: 0.1s;
+}
+
+/* === 2.3 导航链接定义（Header专属） === */
+.nav-links {
+  display: flex;
+  gap: 1rem; /* 链接间距 */
+  a {
+    white-space: nowrap; /* 链接不允许换行 */
+    color: var(--darkgray); /* 默认文字颜色 */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    &:hover {
+      color: var(--tertiary);
+    } /* 悬停颜色 (橙色系) */
+  }
+}
+
+/* === 2.4 签名组件定义（Header专属） === */
+header .signature p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--gray);
+  white-space: nowrap;
+  opacity: 0.8;
+  white-space: pre-wrap; /* 允许手动换行并保留空格 */
+  text-align: justify; /* 多行文本居中对齐 */
+  line-height: 1.2; /* 紧凑行高，防止溢出 80px 高度 */
+
+  /* 防止极端情况溢出 (最多显示5行) */
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  line-clamp: 2; /* 还定义标准属性“line-clamp”以实现兼容性 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* === 2.5 搜索框定义 === */
+/* 搜索框平时是暗淡的，激活时边界发光 */
+.search-button,
+.search-bar {
+  border: 1px solid var(--lightgray);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.search-button:hover,
+.search-bar:focus-within {
+  border-color: var(--secondary);
+  /* 只有边界发光，不干扰内部文字读取 */
+  box-shadow:
+    0 0 15px rgba(91, 194, 231, 0.3) inset,
+    0 0 10px rgba(91, 194, 231, 0.3);
+}
+
+/* 搜索框（Header专属）本身样式优化 */
+header .search {
+  min-width: 100px; /* 强制增加搜索框最小宽度 (原默认值较小) */
+
+  /* 如果是输入框模式，强制宽度 */
+  input {
+    width: 100%;
+  }
+
+  /* 调整内部容器，确保视觉上的长条感 */
+  .search-button {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.03); /* 轻微背景色增加识别度 */
+    border: 1px solid var(--lightgray);
+    border-radius: 5px;
+    padding: 0.4rem 0.8rem;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+/* === 2.6 头像组件 (Avatar) === */
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+
+  a {
+    text-decoration: none;
+    border: none;
+    display: block;
+
+    /* 悬停交互 */
+    &:hover .avatar-img {
+      transform: scale(1.1); /* 放大 */
+      box-shadow: 0 0 15px var(--tertiary); /* 引用 config.ts 中的 secondary 颜色作为发光 */
+    }
+  }
+}
+
+.avatar-img {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%; /* 圆形 */
+  object-fit: cover; /* 防止图片变形 */
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 // ==========================================================================
-// 模块 2: 全局顶部导航栏 (Global Header) - [已重构优化]
-// 结构: Header (Fixed) -> Flex Container (Centered) -> Items (Left + Search Right)
+// 模块 3: 全局顶部导航栏（Global Header）（页眉）
 // ==========================================================================
 
-/* === 2.1 桌面端 Header 容器 === */
+/* === 3.1 桌面端 Header 容器 === */
 /* 将 header 标签本身移除文档流，消除 Grid 布局中的“幽灵占位”空白 */
 header {
   position: absolute; /* 绝对定位，脱离 Grid 流 */
@@ -66,41 +329,53 @@ header > .flex-component {
   /* 尺寸与背景 */
   width: 100%;
   height: 80px; /* 固定高度 */
-  background: rgba(22, 22, 22, 0.85); /* 半透明深色背景 */
-  backdrop-filter: blur(10px); /* 毛玻璃特效 (性能敏感) */
+  background: rgba(22, 22, 22, 0.5); /* 半透明深色背景 */
+  backdrop-filter: blur(12px); /* 毛玻璃特效 (性能敏感) */
   border-bottom: 1px solid var(--lightgray); /* 底部边框，使用 config.ts 定义的变量 */
 
-  /* 布局：用于将内部的内容容器(.flex-component)水平居中 */
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   transition: all 0.3s ease;
-}
-
-/* === 2.2 Quartz Flex 容器重置 === */
-/* 对应 quartz.layout.ts 中的 Component.Flex */
-header > .flex-component {
-  width: 100%;
-  max-width: 1650px; /* 限制内容最大宽度，与页面主体保持一致 */
-  padding: 0 0rem; /* 两侧留白 */
+  padding: 0 0rem; /* 内边距 */
 
   /* Flex 布局配置 */
-  display: flex;
   flex-direction: row;
-  align-items: center;
   gap: 2.5rem; /* 统一设置子元素间距 */
 }
 
-/* === 2.3 子元素通用样式 === */
+/* === 3.2 子元素 Flex 行为控制 === */
 /* 针对 Flex 容器内的直接子 div (Title, Links, Signature, Search) */
 header .flex-component > div {
-  flex: 0 0 auto; /* 禁止压缩，保持内容自然宽度 */
-  display: flex;
-  align-items: center;
-  position: relative; /* 为下方的伪元素分割线提供定位基准 */
+  position: relative; /* 为伪元素分割线提供定位基准 */
 }
 
-/* === 2.4 垂直分割线逻辑 (精确控制) === */
+/* 站点标题 (左侧固定) */
+header .flex-component > div:has(.page-title) {
+  flex: 0 0 auto; /* 禁止压缩，禁止放大 */
+}
+
+/* 导航链接 (左侧固定) */
+header .flex-component > div:has(.nav-links) {
+  flex: 0 0 auto; /* 禁止压缩，禁止放大 */
+}
+
+/* 签名组件 (中间自适应) */
+header .flex-component > div:has(.signature) {
+  flex: 1 1 auto; /* 允许放大(grow=1) 允许压缩(shrink=1) */
+  min-width: 0; /* 关键：允许 flex 子项收缩到内容宽度以下，触发内部文本换行 */
+  display: flex;
+  justify-content: center; /* 文本整体在中间区域居中 */
+}
+
+/* 搜索栏（推到右侧） */
+header .flex-component > div:has(.search) {
+  flex: 0 0 auto; /* 禁止压缩、使搜索框右侧固定 */
+  margin-left: auto; /* 自动占据左侧剩余空间，推向右侧 */
+  margin-right: 2rem; /* 右侧留白空间，防止贴边被遮挡 */
+}
+
+/* === 3.3 垂直分割线逻辑 (精确控制) === */
 header .flex-component > div:nth-child(2)::after, /* 第一个垂直分割线 */
 header .flex-component > div:nth-child(3)::before  /* 第二个垂直分割线 */ {
   content: "";
@@ -112,272 +387,145 @@ header .flex-component > div:nth-child(3)::before  /* 第二个垂直分割线 *
 
   width: 1px;
   height: 40px; /* 线条高度 */
-  background-color: var(--lightgray); /* 跟随主题边框色 */
+  background-color: var(--lightgray); /* 跟随主题蓝色 */
   opacity: 0.6; /* 降低透明度以示区分 */
 }
 
-/* === 2.5 搜索框优化 (位置、长度、平板隐藏) === */
-
-/* 容器定位：推到右侧，但保留一定余地 */
-header .flex-component > div:has(.search) {
-  margin-left: auto; /* 自动占据左侧剩余空间，推向右侧 */
-  margin-right: 2rem; /* 右侧留白空间，防止贴边被遮挡 */
-}
-
-/* 搜索框本身样式优化 */
-header .search {
-  min-width: 100px; /* 强制增加搜索框最小宽度 (原默认值较小) */
-
-  /* 如果是输入框模式，强制宽度 */
-  input {
-    width: 100%;
-  }
-
-  /* 调整内部容器，确保视觉上的长条感 */
-  .search-button {
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.03); /* 轻微背景色增加识别度 */
-    border: 1px solid var(--lightgray);
-    border-radius: 5px;
-    padding: 0.4rem 0.8rem;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-  }
-}
-
-/* === 2.6 Header 内部组件微调 === */
-
-/* 桌面端小标题 */
-.page-title {
-  margin: 0;
-  font-size: 2.2rem;
-  white-space: nowrap;
-}
-
-/* 导航链接 */
-.nav-links {
-  display: flex;
-  gap: 1.5rem; /* 链接间距 */
-  a {
-    white-space: nowrap;
-    color: var(--darkgray); /* 默认文字颜色 */
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease;
-    &:hover {
-      color: var(--tertiary);
-    } /* 悬停颜色 (橙色系) */
-  }
-}
-
-/* 签名组件 */
-.signature {
-  p {
-    margin: 0;
-    font-size: 0.9rem;
-    font-style: italic;
-    color: var(--gray);
-    white-space: nowrap;
-    opacity: 0.8;
-  }
-}
-
 // ==========================================================================
-// 模块 3: 全局颜色与主题强制 (Colors & Theme)
-// 目标: 无论系统设置如何，强制锁定为暗色模式
+// 模块 4: 页面主容器 (.page)
 // ==========================================================================
 
-/* === 3.1 强制暗色模式 === */
-:root {
-  color-scheme: dark !important; /* 保留 !important 防止被浏览器或 OS 设置覆盖 */
-}
-
-/* 锁定 CSS 变量：无论 data-theme 是 light 还是 dark，都使用暗色值 */
-:root[data-theme="light"],
-:root[data-theme="dark"] {
-  --light: #161617; // 与 config.ts 中的背景色一致
-  --darkgray: #d4d4d4; // 与 config.ts 中的正文颜色一致
-}
-
-/* 隐藏深色模式切换按钮 (防止用户切换导致闪烁) */
-#darkmode-toggle {
-  display: none;
-}
-
-// ==========================================================================
-// 模块 4: 核心网格布局 (Page Grid Layout)
-// 结构: .page 容器包含 .left (侧边栏), .center (内容), .right (目录/图谱)
-// ==========================================================================
-
-/* === 4.1 页面主容器 === */
 .page {
-  background-color: #101011; /* 页面底色，比组件背景略深以制造层级感 */
   display: grid; /* Quartz 默认 Grid 布局 */
-  gap: 1.5rem; /* 栏间距 */
   width: 100%;
-  max-width: 1600px; /* 限制最大宽 */
+  max-width: 7680px; /* 限制最大宽为4k */
   margin: 0 auto; /* 居中 */
 }
 
-/* === 4.2 左侧边栏 (Sidebar Left) === */
+// ==========================================================================
+// 模块 5: 左侧边栏 (.Left)
+// ==========================================================================
+
+/* === 5.1 左侧边栏滚动与布局优化 (针对 Explorer 压缩问题) === */
+.left {
+  /* 强制开启 Y 轴滚动，如果有必要只会出现“整体滚动条” */
+  overflow-y: auto !important;
+
+  /* 限制高度为视口高度，配合 sticky 定位使用 */
+  max-height: 100vh !important;
+  position: sticky !important;
+  top: 0 !important;
+
+  /* 使用 Flex 布局，并确保内容从顶部开始排列 */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 1rem; /* 组件之间的间距，可根据喜好调整 */
+
+  /* 隐藏滚动条 (Chrome/Safari/Firefox) */
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 禁止 .left 下的所有直接子元素被压缩 */
+  > * {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* === 5.2 左侧边栏内部 基本定义 === */
 .sidebar.left {
-  background-color: #161617; /* 独立卡片背景 */
+  background-color: rgba(22, 22, 22, 0.7); /* 独立卡片背景 */
+  backdrop-filter: blur(10px); /* 卡片背景半透明 */
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid #2d2d2e; /* 微弱边框 */
   padding: 1.5rem; /* 内边距，防止内容贴边 */
   height: fit-content; /* 高度随内容自适应 */
 }
 
-/* === 4.3 中间内容区 (Center) === */
+/* === 5.3 左侧边栏内部头像名 === */
+.sidebar.left .signature {
+  /* 容器布局 */
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  margin-top: -2.5rem; /* 向上提，紧贴头像 */
+  margin-bottom: 1rem; /* 向下推 */
+  padding: 0 0.5rem;
+
+  p {
+    /* 字体重置 - 覆盖默认的斜体灰色样式 */
+    font-family: var(--headerFont) !important; /* 使用配置中的标题字体 */
+    font-size: 2rem !important; /* 字号略小于 PageTitle 但大于正文 */
+    font-weight: 700 !important; /* 加粗 */
+    font-style: normal !important; /* 移除斜体 */
+    text-align: center;
+    opacity: 1 !important; /* 移除透明度 */
+    letter-spacing: 0.2rem; /* 调整数值以控制字母间的间距 */
+    white-space: nowrap; /* 不允许换行 */
+
+    /* 赛博朋克风格 - 亮蓝色渐变 */
+    background: linear-gradient(90deg, #0078d2, #00d4ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    /* 简单的光晕效果 */
+    filter: drop-shadow(0 0 5px rgba(0, 120, 210, 0.3));
+  }
+}
+
+/* === 5.4 左侧边栏内部头像第二行文本 === */
+.sidebar.left .signature.secondary-text {
+  /* 布局重置 */
+  margin-top: -4.5rem !important; /* 向上提，拉近与主标题的距离 */
+  margin-bottom: -0.5rem !important; /* 向下推 */
+
+  p {
+    /* 样式彻底重置 - 覆盖上面的赛博朋克效果 */
+
+    // 1. 移除渐变和透明填充，恢复实体颜色
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+
+    // 2. 设置新的字体风格 (示例：灰色、更小、无衬线代码风)
+    color: var(--gray) !important; /* 使用 Quartz 变量或具体色值 #888 */
+    font-family: var(--codeFont) !important; /* 改用等宽字体 */
+    font-size: 0.8rem !important; /* 字号变小 */
+    font-weight: 400 !important; /* 正常字重 */
+    letter-spacing: 0.2rem !important; /* 减小字间距 */
+    text-transform: uppercase; /* 全大写 */
+
+    // 3. 移除光晕
+    filter: none !important;
+
+    // 4. 可选：添加一点微弱的打字机边框效果
+    border-top: 1px solid var(--gray);
+    padding-top: 0rem;
+  }
+}
+
+// ==========================================================================
+// 模块 6: 中间内容区 (.Center)
+// ==========================================================================
+
+/* === 6.1 中间内容区 基本定义 === */
 .center {
   box-sizing: border-box; /* 核心：防止 padding 撑大宽度 */
-  background-color: #161617;
+  background-color: rgba(22, 22, 22, 0.7); /* 独立卡片背景 */
   border: 1px solid #2d2d2e;
+  border-radius: 16px; // 圆角
+  // 背景模糊，可降低 saturate，避免文字背景色过于艳丽干扰阅读
+  backdrop-filter: blur(12px) saturate(110%);
+  -webkit-backdrop-filter: blur(12px) saturate(110%);
   padding: 2rem;
 
   width: 100%;
   max-width: 100%;
-  overflow: hidden; /* 防止代码块或宽图片溢出容器 */
 }
 
-/* === 4.5 右侧边栏 (Sidebar Right) === */
-.sidebar.right {
-  background-color: #161617;
-  border: 1px solid #2d2d2e;
-  padding: 1.5rem;
+/* === 6.2 文章主标题 (Article Title) === */
 
-  /* 粘性定位逻辑 */
-  position: sticky;
-  top: 1.5rem; /* 距离视口顶部的吸附距离 */
-
-  /* 滚动逻辑 */
-  max-height: calc(100vh); /* 限制最大高度为视口高度 */
-  overflow-y: auto; /* 内容过长时允许内部滚动 */
-
-  /* 布局控制 */
-  display: flex;
-  flex-direction: column;
-  gap: 2rem; /* 内部组件间距 */
-
-  /* 隐藏滚动条外观 (Chrome/Safari/Firefox) */
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-// ==========================================================================
-// 模块 5: 组件特定样式 (Components)
-// ==========================================================================
-
-/* === 5.1 头像组件 (Avatar) === */
-.avatar-container {
-  display: flex;
-  justify-content: center;
-  padding: 1rem 0;
-  margin-bottom: 0.5rem;
-
-  a {
-    text-decoration: none;
-    border: none;
-    display: block;
-
-    /* 悬停交互 */
-    &:hover .avatar-img {
-      transform: scale(1.1); /* 放大 */
-      box-shadow: 0 0 15px var(--tertiary); /* 引用 config.ts 中的 secondary 颜色作为发光 */
-    }
-  }
-}
-
-.avatar-img {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%; /* 圆形 */
-  object-fit: cover; /* 防止图片变形 */
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-/* === 5.2 目录组件 (TOC) - 保持原有强制逻辑以修复折叠问题 */
-/* 注意：此处保留 !important 是为了防止 JS 内联样式覆盖 display 状态 */
-
-.sidebar.right .toc {
-  /* 容器基础重置 */
-  max-height: none !important;
-  overflow: visible !important;
-
-  /* 折叠按钮样式 (.toc-header) */
-  .toc-header {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    padding: 0;
-
-    /* 箭头旋转动画 */
-    &.collapsed svg {
-      transform: rotate(-90deg);
-    }
-    svg {
-      transition: transform 0.2s ease;
-    }
-  }
-
-  /* --- 核心修复：基于状态控制内容显示 --- */
-
-  /* 场景 A: 展开状态 (header 没有 .collapsed 类) */
-  /* 选择所有的动态 ID 容器 (id 以 "toc-" 开头) 以及 #toc-content */
-  .toc-header:not(.collapsed) + div[id^="toc-"],
-  .toc-header:not(.collapsed) + #toc-content {
-    display: block !important;
-    max-height: none !important; /* 允许内容撑开 */
-    overflow: visible !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  /* 场景 B: 折叠状态 (header 包含 .collapsed 类) */
-  .toc-header.collapsed + div[id^="toc-"],
-  .toc-header.collapsed + #toc-content {
-    display: none !important; /* 彻底移除 DOM 占位，允许下方组件上移 */
-    max-height: 0 !important;
-    overflow: hidden !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-  }
-
-  /* 列表与链接样式 */
-  ul,
-  li {
-    /* 移除不必要的 !important，颜色由下方 a 标签控制 */
-    background: transparent;
-  }
-
-  a {
-    color: rgb(212, 212, 212); /* 未激活状态颜色 */
-    opacity: 1;
-    transition:
-      color 0.2s ease,
-      transform 0.2s ease;
-
-    &:hover {
-      color: var(--tertiary); /* 悬停高亮 */
-      transform: translateX(4px); /* 右移交互反馈 */
-    }
-
-    /* 当前阅读章节高亮 */
-    &.in-view {
-      color: rgb(91, 194, 231);
-      font-weight: 600;
-      opacity: 1;
-    }
-  }
-}
-
-/* === 5.3 文章标题 (Article Title) === */
 .article-title {
   font-size: 2.8rem !important;
   color: var(--lightgray) !important;
@@ -399,167 +547,479 @@ header .search {
   -webkit-text-fill-color: transparent;
 }
 
+/* === 6.2 文章(H1、H2)标题 === */
+
+h1,
+h2 {
+  /* 扩散出 secondary 主题色 */
+  text-shadow: 0 0 3px var(--secondary);
+  opacity: 1;
+}
+
+/* === 6.3 代码块 === */
+/* --- 代码块 (Code Block) 增加玻璃质感 --- */
+code {
+  transition: border-color 0.3s;
+}
+
+pre > code {
+  border: 1px solid transparent;
+}
+
+pre:hover > code {
+  /* 鼠标经过代码块时，边框微微亮起 */
+  border-color: var(--gray);
+  box-shadow: 0 0 20px 5px var(--gray);
+}
+
+/* === 6.4 afterBody中的Signature */
+.center .signature.secondary-text {
+  p {
+    margin: 0;
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--gray);
+    white-space: nowrap;
+    opacity: 0.8;
+    text-align: end;
+    white-space: pre-wrap; /* 允许手动换行并保留空格 */
+  }
+}
+
 // ==========================================================================
-// 模块 6: 针对移动端优化
+// 模块 7: 右侧边栏 (.Right)
 // ==========================================================================
 
-/* 6.1 平板模式（1200px）下隐藏 header 中的搜索框 */
+/* === 7.1 右侧边栏滚动与布局优化 (针对 toc 压缩问题) === */
+.right {
+  /* 强制开启 Y 轴滚动，如果有必要只会出现“整体滚动条” */
+  overflow-y: auto !important;
+
+  /* 限制高度为视口高度，配合 sticky 定位使用 */
+  max-height: 100vh !important;
+  position: sticky !important;
+  top: 0 !important;
+
+  /* 使用 Flex 布局，并确保内容从顶部开始排列 */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 1rem; /* 组件之间的间距，可根据喜好调整 */
+
+  /* 隐藏滚动条 (Chrome/Safari/Firefox) */
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 禁止 .left 下的所有直接子元素被压缩 */
+  > * {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* === 7.2 右侧边栏 基本定义 === */
+.sidebar.right {
+  margin-top: 1rem; /* 顶部间距 */
+  background-color: rgba(22, 22, 22, 0.7); /* 独立卡片背景 */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid #2d2d2e;
+  padding: 1.5rem;
+}
+
+/* === 7.3 目录组件 (TOC) - 折叠问题优化 === */
+/* 注意：此处保留 !important 是为了防止 JS 内联样式覆盖 display 状态 */
+.sidebar.right .toc {
+  /* 容器基础重置 */
+  max-height: none !important;
+  overflow: visible !important;
+
+  a {
+    color: var(--darkgray); /* 未激活状态颜色 */
+    opacity: 1;
+    transition:
+      color 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      color: var(--tertiary); /* 悬停高亮 */
+      transform: translateX(40px); /* 右移交互反馈 */
+    }
+
+    /* 当前阅读章节高亮 */
+    &.in-view {
+      color: var(--secondary);
+      font-weight: 600;
+      opacity: 1;
+    }
+  }
+}
+
+// ==========================================================================
+// // 模块 8: 脚注（Footnotes）与页脚栏（footer）
+// ==========================================================================
+
+/* 8.1. 隐藏原始的 Footnotes 英文 */
+.footnotes h2 {
+  visibility: hidden;
+  position: relative;
+}
+
+/* 插入中文“脚注”文字 */
+.footnotes h2::after {
+  content: "脚注";
+  visibility: visible;
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: bold;
+}
+
+/* 8.2. footer强制高度修正 + 解决底部空白 */
+footer {
+  box-sizing: border-box; /* 核心：防止 padding 撑大宽度 */
+  background-color: rgba(22, 22, 22); /* 独立卡片背景 */
+  border: 1px solid #2d2d2e;
+  border-radius: 16px; // 圆角
+
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  margin: 0 0 1rem 0; /* 强制定义外边距 */
+  padding: 1rem 2rem !important; /* 强制定义内边距 */
+}
+
+footer p {
+  margin-top: 0rem;
+  margin-bottom: 0rem;
+  text-align: center; // 居中
+}
+
+// ==========================================================================
+// 模块 9: 针对移动端优化
+// ==========================================================================
+
+/* 9.1 平板模式（1200px）下隐藏 header 中的搜索框 */
 @media all and (max-width: 1200px) {
   header .flex-component > div:has(.search) {
     display: none !important; /* 强制隐藏 */
   }
 }
 
-/* 6.2. 默认在桌面端隐藏 Header 里的头像 */
+/* 9.2. 默认在桌面端隐藏 Header 里的头像 */
 header .avatar-container {
   display: none;
 }
 
-/* 6.3. 手机模式（800px）专项优化 */
+/* 9.3. 手机模式（800px）专项优化 */
 @media all and (max-width: 800px) {
-  /* 6.4. Header 容器高度增加，以容纳两行内容 */
+  /* 9.3.1. Header 容器布局重构 */
   header > .flex-component {
-    height: 120px;
-    padding: 0rem 1rem;
-    align-items: center !important; /* 垂直居中整个网格 */
-  }
+    height: auto !important; /* 高度改为自适应，由内容撑开 */
+    min-height: 100px;
+    padding: 0rem 0rem !important; /* 内边距 */
 
-  /* 6.5. 核心 Grid 布局：2行 x 2列 */
-  header .flex-component {
+    /* === 关键修复：强制靠左，消除默认的居中行为 === */
+    width: 100% !important;
+    max-width: 100% !important; /* 覆盖 base.scss 可能存在的 max-width: 1200px */
+    margin: 0 !important;
+    left: 0 !important;
+
+    /* 核心 Grid 布局：改为 2行 x 4列 */
     display: grid !important;
-    /* 列定义：左侧头像固定宽度(80px)，右侧剩余空间自适应(1fr) */
-    grid-template-columns: 120px 1fr;
-    /* 行定义：两行高度均分或自适应 */
-    grid-template-rows: 80px 40px;
-    column-gap: 0; /* 列间距 */
-    row-gap: 0; /* 行间距 */
-    padding: 0 0rem;
+    /* 列定义：两侧弹性空间(1fr)负责挤压居中，中间两列(auto)适应内容 */
+    grid-template-columns: 1rem auto 1fr;
+    /* 行定义：第一行身份区，第二行导航区 */
+    grid-template-rows: auto auto;
+    column-gap: 0rem; /* 布局内元素的左右间距 */
+    row-gap: 0rem; /* 布局内元素的上下间距 */
+
+    background: rgba(22, 22, 22, 0.6); /* 略微加深背景 */
   }
 
-  /* 6.6. 头像组件：位于左侧，跨越两行 (Row 1-2) */
+  /* 9.3.2. 头像组件 */
   header .flex-component > div:has(.avatar-container),
   header .avatar-container {
     display: flex !important;
-    position: relative; /* 指定元素定位（⬇️手动调整偏移） */
-    top: 3px; /* 上偏移量 */
-    left: 3px; /* 左偏移量 */
-    grid-row: 1 / 3; /* 纵跨第1至第3条网格线（即占满两行） */
-    grid-column: 1; /* 第1列 */
-    justify-content: flex-end; /* 靠右对齐 */
+    grid-row: 1; /* 第1行 */
+    grid-column: 2; /* 第2列 */
+    justify-content: center; /* 靠右对齐，紧贴标题 */
     align-items: center;
+    margin: 0.5rem 0 0.4rem 0;
+    padding: 0;
 
     .avatar-img {
-      width: 80px !important; /* 限制头像大小 */
-      height: 80px !important;
+      width: clamp(1rem, 15vw, 90px); /* 范围内自适应调整大小（最小,自适应值,最大）*/
+      height: clamp(1rem, 15vw, 90px);
+      border-radius: 50%;
       margin: 0;
-      border-radius: 50%; /* 圆形 */
-      object-fit: cover; /* 防止图片变形 */
     }
   }
 
-  /* 6.7. 站点标题：位于右侧第一行，靠左对齐 */
+  /* 9.3.3. 站点标题 */
   header .flex-component > div:has(.page-title) {
     grid-row: 1; /* 第1行 */
-    grid-column: 2; /* 第2列 */
-    justify-content: flex-start; /* 靠左对齐 */
-    align-self: end; /* 稍微靠下，紧贴第二行 */
-    position: relative; /* 指定元素定位（⬇️手动调整偏移） */
-    top: 5px; /* 上偏移量 */
-    left: -10px; /* 左偏移量 */
+    grid-column: 3; /* 第3列 */
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: flex-start; /* 靠左对齐，紧贴头像 */
+    width: auto; /* 宽度由文字内容决定 */
 
     .page-title {
       margin: 0;
-      line-height: 1.2;
+      line-height: 1.1;
+      width: auto;
     }
 
     .page-title a {
-      font-size: 2.2rem !important; /* 移动端字号调整 */
-      text-align: right;
+      font-size: clamp(1rem, 10vw, 5rem); /* 范围内自适应调整大小（最小,自适应值,最大）*/
+      padding: 1rem 0 1rem 0;
+
+      text-align: left;
+      display: inline-block; /* 保持行内块，避免占满整行 */
+      white-space: nowrap; /* 确保不换行 */
     }
   }
 
-  /* 6.8. 导航链接：位于右侧第二行，靠左对齐 */
+  /* 9.3.4. 导航链接：独占第二行 */
   header .flex-component > div:has(.nav-links) {
-    grid-row: 2; /* 第2行 */
-    grid-column: 2; /* 第2列 */
-    justify-content: flex-start; /* 靠左对齐 */
-    align-self: start; /* 稍微靠上，紧贴第一行 */
-    position: relative; /* 指定元素定位（⬇️手动调整偏移） */
-    top: -15px; /* 上偏移量 */
-    left: -10px; /* 左偏移量 */
+    grid-row: 2; /* 移至第2行 */
+    grid-column: 1 / -1; /* 跨越所有列 */
+    width: 100%; /* 强制宽度 */
+    min-width: 0; /* 防止 Flex 子项溢出 */
+
+    position: static;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* 增加一条分割线 */
 
     .nav-links {
       display: flex;
-      gap: 1rem; /* 链接间距 */
+      flex-direction: row;
+      gap: 1.5rem; /* 增加链接间距，便于手指点击 */
+      justify-content: center; /* 内容居中 */
+
+      /* === 核心：横向滚动逻辑 === */
+      overflow-x: hidden; /* 禁止横向滚动 */
+      overflow-y: hidden;
+      white-space: nowrap; /* 强制不换行 */
+      -webkit-overflow-scrolling: touch; /* iOS 惯性滚动支持 */
+
+      padding: 0 0.2rem; /* 增加右内边距，给搜索框让位 */
+
+      /* 增加左右内边距，防止第一个/最后一个元素贴边 */
+
+      /* 隐藏滚动条 (Chrome/Safari/Webkit) */
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      /* 隐藏滚动条 (Firefox) */
+      scrollbar-width: none;
 
       a {
-        font-size: 1rem;
-        font-weight: 600;
+        font-size: clamp(1rem, 3.5vw, 1.5rem); /* 范围内自适应调整大小（最小,自适应值,最大）*/
+        font-weight: 500;
+        padding: 0.5rem 0; /* 增加点击区域 */
+        color: var(--gray);
+
+        /* 选中态/悬停态优化 */
+        &.active,
+        &:hover {
+          color: var(--tertiary);
+        }
       }
     }
   }
 
-  /* 6.9. 彻底隐藏 签名(Signature) 和 搜索(Search) */
-  header .flex-component > div:has(.signature),
-  header .flex-component > div:has(.search) {
+  /* 9.3.5. 隐藏签名 */
+  header .flex-component > div:has(.signature) {
     display: none !important;
   }
 
-  /* 6.10. 移除可能存在的分割线 (伪元素) */
-  header .flex-component > div::after {
-    display: none !important;
+  /* 9.3.6. 移动端搜索框样式定义 */
+  header .flex-component > div:has(.search) {
+    display: block !important; /* 强制显示 (覆盖 9.1 的 hidden) */
+    position: absolute; /* 绝对定位，不占用 Grid 空间 */
+    bottom: -3rem; /* 底部对齐 */
+    right: 1rem; /* 右侧对齐 */
+    margin: 0 !important;
+    width: auto !important;
+    z-index: 10;
   }
+
+  /* 搜索框内部样式微调：变身小图标按钮 */
+  header .search {
+    min-width: auto !important; /* 取消最小宽度限制 */
+
+    /* 调整内部按钮尺寸，使其像一个方形图标 */
+    .search-button {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+
+      /* 隐藏内部文字 (Search) 只留图标 */
+      p {
+        display: none;
+      }
+      /* 如果是用 span 包裹文字的情况 */
+      span {
+        display: none;
+      }
+      /* 确保 SVG 图标可见 */
+      svg {
+        display: block;
+        width: 18px;
+        height: 18px;
+        opacity: 0.8;
+      }
+    }
+  }
+
+  /* 9.3.7. 清理分割线 */
+  header .flex-component > div::after,
   header .flex-component > div::before {
     display: none !important;
   }
 
-  /* 6.11. 左侧边栏 (left) 响应式修正 */
+  /* 9.4. 左侧边栏 (left) 响应式修正 */
   .sidebar.left {
-    border: none !important; /* 移动端去框，增加可视面积 */
-    padding: 0rem 0rem !important; /* 内边距，与下面.center一致 */
-    background-color: transparent !important;
-
-    .Signature {
-      margin-left: auto; /* 自动占据左侧剩余空间，推向右侧 */
-      font-size: 3rem !important;
-    }
-
-    /* 针对移动端左侧栏内搜索框的微调 */
-    .search {
-      margin-left: auto; /* 自动占据左侧剩余空间，推向右侧 */
-      margin-right: 0.5rem; /* 右侧留白空间 */
-      width: 100%;
-      max-width: 80px; /* 强制搜索框最小宽度 (原默认值较小) */
-
-      .search-button {
-        background-color: rgba(255, 255, 255, 0.03); /* 轻微背景色增加识别度 */
-        border: 1px solid var(--lightgray);
-        border-radius: 5px;
-        padding: 0rem;
-      }
-    }
-  }
-
-  /* === 6.12. 强制隐藏左侧边栏的头像 */
-  .sidebar.left .avatar-container {
     display: none !important;
   }
 
-  /* 6.13. 页面正文下移，防止被 Header 覆盖 */
+  /* 9.5. 页面正文下移，防止被 Header 覆盖 */
   .page {
-    padding-top: 150px !important; /* 与 sidebar.left 的 top 保持一致 */
+    padding-top: 160px !important; /* 与 sidebar.left 的 top 保持一致 */
   }
 
-  /* 6.14. 中间内容区 (Center) 响应式修正  */
+  /* 9.6. 中间内容区 (Center) 响应式修正  */
   .center {
     padding: 0.5rem !important;
     border: none !important; /* 移动端去框，增加可视面积 */
     background-color: transparent !important;
 
-    /* 缩小移动端标题字号 */
+    /* 缩小移动端标题间距 */
     article h1 {
-      font-size: 1.8rem !important;
       margin-top: 1rem !important;
     }
   }
+
+  /* afterBody中的Signature */
+  .center .signature.secondary-text {
+    p {
+      text-align: center;
+    }
+  }
+
+  /* 9.7. 右侧边栏 (Sidebar Right) 响应式修正  */
+  .sidebar.right {
+    padding: 2rem 0.5rem 0.5rem 0.5rem !important;
+    border: none; /* 移动端去框，增加可视面积 */
+    background-color: transparent !important;
+    border-top: 1px solid var(--lightgray); /* 顶边框 */
+  }
+
+  /* 9.8. footer栏 响应式修正  */
+  footer {
+    background-color: rgba(0, 0, 0, 0); /* 去色 */
+    border: 1px solid var(--lightgray); /* 框匹配蓝色主题 */
+    border-radius: 8px; // 圆角
+    margin: 1rem 0 2rem 0; /* 强制定义外边距 */
+  }
+
+  /* 9.9. 背景光斑动画 响应式修正  */
+  /* 加深背景色作为移动端没有卡片背景的抵消 */
+  body {
+    background-color: rgb(10, 10, 10);
+  }
+  /* === 蓝色光斑本体 === */
+  body::before {
+    animation: fluid-flow-primary-800px 30s infinite linear; /*定义新的动画*/
+  }
+
+  /* === 橙色光斑本体 === */
+  body::after {
+    animation: fluid-flow-secondary-800px 30s infinite linear; /*定义新的动画*/
+  }
+
+  /* === 蓝色光斑 动画 === */
+  /* 移动端定制动画 */
+  @keyframes fluid-flow-primary-800px {
+    0% {
+      transform: translate(-50%, -50%) translate(0, 20vh) scale(1);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translate(-50%, -50%) translate(100vw, 20vh) scale(4);
+      opacity: 0.3;
+    }
+    100% {
+      transform: translate(-50%, -50%) translate(0, 20vh) scale(1);
+      opacity: 0.4;
+    }
+  }
+
+  /* === 橙色光斑 动画 === */
+  /* 移动端定制动画 */
+  @keyframes fluid-flow-secondary-800px {
+    0% {
+      transform: translate(-50%, -50%) translate(100vw, 100vh) scale(0.5);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translate(-50%, -50%) translate(0, 100vh) scale(3);
+      opacity: 0.3;
+    }
+    100% {
+      transform: translate(-50%, -50%) translate(100vw, 100vh) scale(0.5);
+      opacity: 0.4;
+    }
+  }
+}
+
+// ==========================================================================
+// 模块 10: 交互体验增强 (Interactions)
+// ==========================================================================
+
+/* 10.1 全局平滑滚动 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 10.2 回到顶部链接样式优化 (Footer) */
+footer .back-to-top {
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+  display: inline-block;
+
+  &:hover {
+    color: var(--tertiary); /* 使用主题色 */
+  }
+}
+
+/* 10.3 首页卡片优化 */
+/* 仅在首页生效 */
+[data-slug="index"] .page .article {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 让 Markdown 里的占位符之后的元素排在最后 */
+#link-cards-placeholder {
+  order: 2;
+}
+
+/* 让我们的 TSX 组件排在中间 */
+.link-cards-container {
+  order: 2; /* 根据需要调整 0, 1, 2 的1顺序 */
 }

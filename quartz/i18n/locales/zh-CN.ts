@@ -7,7 +7,7 @@ export default {
   },
   components: {
     callout: {
-      note: "笔记",
+      note: "文章",
       abstract: "摘要",
       info: "提示",
       todo: "待办",
@@ -36,18 +36,18 @@ export default {
       title: "探索",
     },
     footer: {
-      createdWith: "Created with",
+      createdWith: "本站基于",
     },
     graph: {
       title: "关系图谱",
     },
     recentNotes: {
-      title: "最近的笔记",
-      seeRemainingMore: ({ remaining }) => `查看更多${remaining}篇笔记 →`,
+      title: "最近的文章",
+      seeRemainingMore: ({ remaining }) => `查看更多${remaining}篇文章 →`,
     },
     transcludes: {
       transcludeOf: ({ targetSlug }) => `包含${targetSlug}`,
-      linkToOriginal: "指向原始笔记的链接",
+      linkToOriginal: "指向原始文章的链接",
     },
     search: {
       title: "搜索",
@@ -57,27 +57,27 @@ export default {
       title: "目录",
     },
     contentMeta: {
-      readingTime: ({ minutes }) => `${minutes}分钟阅读`,
+      readingTime: ({ minutes }) => `全文阅读时间：约 ${minutes} 分钟`,
     },
   },
   pages: {
     rss: {
-      recentNotes: "最近的笔记",
-      lastFewNotes: ({ count }) => `最近的${count}条笔记`,
+      recentNotes: "最近的文章",
+      lastFewNotes: ({ count }) => `最近的${count}条文章`,
     },
     error: {
       title: "无法找到",
-      notFound: "私有笔记或笔记不存在。",
+      notFound: "私有文章或文章不存在。",
       home: "返回首页",
     },
     folderContent: {
       folder: "文件夹",
-      itemsUnderFolder: ({ count }) => `此文件夹下有${count}条笔记。`,
+      itemsUnderFolder: ({ count }) => `此文件夹下的总文章数为 ${count} 篇：`,
     },
     tagContent: {
       tag: "标签",
       tagIndex: "标签索引",
-      itemsUnderTag: ({ count }) => `此标签下有${count}条笔记。`,
+      itemsUnderTag: ({ count }) => `此标签下有${count}条文章。`,
       showingFirst: ({ count }) => `显示前${count}个标签。`,
       totalTags: ({ count }) => `总共有${count}个标签。`,
     },
