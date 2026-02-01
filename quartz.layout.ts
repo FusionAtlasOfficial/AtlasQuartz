@@ -21,11 +21,11 @@ export const sharedPageComponents: SharedLayout = {
             // 导航链接组件
             {
               links: {
-                首页: "/",
-                最新内容: "/安卓刷机-Android/Atlas_个人刷机笔记_20260108",
-                笔记杂项: "/笔记杂项页",
-                更新日志: "/网站更新日志",
-                关于: "/关于我-AboutMe",
+                首页: "./",
+                最新内容: "安卓刷机-Android/Atlas_个人刷机笔记_20260108",
+                笔记杂项: "笔记杂项页",
+                更新日志: "网站更新日志",
+                关于: "关于我-AboutMe",
               },
             },
           ),
