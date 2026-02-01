@@ -13,13 +13,13 @@ const cards: CardData[] = [
   {
     title: "正式发布",
     desc: "完整版\n成体系的内容",
-    link: "/正式发布页",
+    link: "正式发布页",
     icon: "🚀",
   },
   {
     title: "笔记杂项",
     desc: "好记性\n不如烂服务器",
-    link: "/笔记杂项页",
+    link: "笔记杂项页",
     icon: "✍️",
   },
   {
