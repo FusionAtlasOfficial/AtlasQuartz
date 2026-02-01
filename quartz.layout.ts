@@ -22,7 +22,7 @@ export const sharedPageComponents: SharedLayout = {
             {
               links: {
                 首页: "./",
-                最新内容: "安卓刷机-Android/atlas_个人刷机笔记_20260108",
+                最新内容: "安卓刷机-Android/Atlas_个人刷机笔记_20260108",
                 笔记杂项: "笔记杂项页",
                 更新日志: "网站更新日志",
                 关于: "关于我-AboutMe",

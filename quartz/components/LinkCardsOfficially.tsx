@@ -13,25 +13,25 @@ const cards: CardData[] = [
   {
     title: "2026安卓救砖/刷机/备份入门知识超级汇总 & 小米12Pro刷机笔记",
     desc: "前后总耗时近一个月，最终全文近四万字，算是笔者竭尽所能追求详尽完整而写的刷机教程汇总文，不敢说多么深刻全面，但至少力求准确，同时尽可能提高可读性。",
-    link: "/安卓刷机-Android",
+    link: "安卓刷机-Android",
     icon: "📱",
   },
   {
     title: "筹备中...",
     desc: "To be continued...... 😋 ",
-    link: "/笔记杂项页",
+    link: "笔记杂项页",
     icon: "⏳️",
   },
   {
     title: "筹备中...",
     desc: "To be continued...... 😋 ",
-    link: "/笔记杂项页",
+    link: "笔记杂项页",
     icon: "⏳️",
   },
   {
     title: "筹备中...",
     desc: "To be continued...... 😋 ",
-    link: "/笔记杂项页",
+    link: "笔记杂项页",
     icon: "⏳️",
   },
 ]
