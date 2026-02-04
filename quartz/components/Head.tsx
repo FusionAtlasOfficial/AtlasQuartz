@@ -50,6 +50,13 @@ export default (() => {
             )}
           </>
         )}
+        {/* --- 新增：强制引入 Noto Color Emoji 兼容老设备 --- */}
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" 
+          rel="stylesheet" 
+        />
+        {/* ----------------------------------------------- */}
+
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 

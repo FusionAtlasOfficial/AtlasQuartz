@@ -1,3 +1,4 @@
+import { JSX } from "preact"
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 
 // 定义卡片的数据结构
@@ -5,7 +6,7 @@ interface CardData {
   title: string
   desc: string
   link: string
-  icon?: string // 支持 emoji 或图片链接
+  icon?: string | JSX.Element | any  // 扩展类型，支持字符串(URL/Emoji)或直接嵌入 SVG}
 }
 
 // 这里配置你的卡片内容
@@ -14,23 +15,31 @@ const cards: CardData[] = [
     title: "2026安卓救砖/刷机/备份入门知识超级汇总 & 小米12Pro刷机笔记",
     desc: "前后总耗时近一个月，最终全文近四万字，算是笔者竭尽所能追求详尽完整而写的刷机教程汇总文，不敢说多么深刻全面，但至少力求准确，同时尽可能提高可读性。",
     link: "安卓刷机-Android/",
-    icon: "📱",
+    icon: (
+      <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Android</title><path d="M18.4395 5.5586c-.675 1.1664-1.352 2.3318-2.0274 3.498-.0366-.0155-.0742-.0286-.1113-.043-1.8249-.6957-3.484-.8-4.42-.787-1.8551.0185-3.3544.4643-4.2597.8203-.084-.1494-1.7526-3.021-2.0215-3.4864a1.1451 1.1451 0 0 0-.1406-.1914c-.3312-.364-.9054-.4859-1.379-.203-.475.282-.7136.9361-.3886 1.5019 1.9466 3.3696-.0966-.2158 1.9473 3.3593.0172.031-.4946.2642-1.3926 1.0177C2.8987 12.176.452 14.772 0 18.9902h24c-.119-1.1108-.3686-2.099-.7461-3.0683-.7438-1.9118-1.8435-3.2928-2.7402-4.1836a12.1048 12.1048 0 0 0-2.1309-1.6875c.6594-1.122 1.312-2.2559 1.9649-3.3848.2077-.3615.1886-.7956-.0079-1.1191a1.1001 1.1001 0 0 0-.8515-.5332c-.5225-.0536-.9392.3128-1.0488.5449zm-.0391 8.461c.3944.5926.324 1.3306-.1563 1.6503-.4799.3197-1.188.0985-1.582-.4941-.3944-.5927-.324-1.3307.1563-1.6504.4727-.315 1.1812-.1086 1.582.4941zM7.207 13.5273c.4803.3197.5506 1.0577.1563 1.6504-.394.5926-1.1038.8138-1.584.4941-.48-.3197-.5503-1.0577-.1563-1.6504.4008-.6021 1.1087-.8106 1.584-.4941z"/></svg>
+    ),
+  },
+  {
+    title: "如何搞一个自己的网站？（其实是网站开发日志页 🤪）",
+    desc: "绝大多数人对网站构建的完整流程没有太多概念，那我在做简单科普的同时，也是为自己梳理思路，何乐而不为？",
+    link: "网站开发日志",
+    icon: "🧐",
+  },
+  {
+    title: "为什么要搞一个自己的网站？（其实是首页 🤪）",
+    desc: "首页当然也算！哔哔了不少字儿呢！才不是为了能多占一个位置显得没那么空......",
+    link: "./",
+    icon: "🤔",
   },
   {
     title: "筹备中...",
-    desc: "To be continued...... 😋 ",
+    desc: "To be continued...... 😋",
     link: "笔记杂项页",
     icon: "⏳️",
   },
   {
     title: "筹备中...",
-    desc: "To be continued...... 😋 ",
-    link: "笔记杂项页",
-    icon: "⏳️",
-  },
-  {
-    title: "筹备中...",
-    desc: "To be continued...... 😋 ",
+    desc: "To be continued...... 😋",
     link: "笔记杂项页",
     icon: "⏳️",
   },
@@ -51,10 +60,22 @@ const LinkCardsOfficially: QuartzComponent = ({ displayClass }: QuartzComponentP
   return (
     <>
       <div class={`link-cards-officially-container ${displayClass ?? ""}`} style={gridStyle}>
-        {cards.map((card) => (
+      {cards.map((card) => {
+          // 判断 icon 的渲染逻辑
+          const renderIcon = () => {
+            if (typeof card.icon === 'string') {
+              if (card.icon.startsWith('http') || card.icon.startsWith('/')) {
+                return <img src={card.icon} alt={card.title} loading="lazy" />;
+              }
+              return <span>{card.icon}</span>;
+            }
+            return card.icon; // 如果是 JSX (SVG)，直接渲染
+          };
+
+          return (
           <a href={card.link} class="link-card-officially">
           {/* 左侧图标区域 */}
-          <div class="card-icon-wrapper-officially">{card.icon}</div>
+          <div class="card-icon-wrapper-officially">{renderIcon()}</div>
           
           {/* 右侧文字区域 */}
           <div class="card-content-wrapper-officially">
@@ -65,7 +86,8 @@ const LinkCardsOfficially: QuartzComponent = ({ displayClass }: QuartzComponentP
           {/* 装饰箭头 */}
           <div class="card-arrow">→</div>
         </a>
-        ))}
+          );
+        })}
       </div>
 
       {/* 搬运脚本：将 display 强制设为 grid 以防止 JS 覆盖样式 */}
@@ -131,6 +153,26 @@ LinkCardsOfficially.css = `
   height: 50px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
+}
+
+/* 针对嵌入式 SVG 的样式 */
+.card-icon-wrapper-officially svg {
+  width: 35px;
+  height: 35px;
+  fill: currentColor;                /* 关键：使 SVG 填充颜色继承父级的 color 属性 */
+  transition: fill 0.3s ease;
+}
+
+/* 图片图标样式 (当 icon 为 URL 时) */
+.card-icon-wrapper-officially img {
+  width: 40px;                        /* 限制图标宽度 */
+  height: 40px;                       /* 限制图标高度 */
+  object-fit: contain;                /* 保持图片比例 */
+}
+
+/* 文本/Emoji 图标样式 */
+.card-icon-wrapper-officially span {
+  font-size: 2rem;                    /* 增大 Emoji 尺寸 */
 }
 
 .card-content-wrapper-officially {

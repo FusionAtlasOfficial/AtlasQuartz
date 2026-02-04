@@ -1023,3 +1023,31 @@ footer .back-to-top {
 .link-cards-container {
   order: 2; /* 根据需要调整 0, 1, 2 的1顺序 */
 }
+
+/* emoji增强 */
+:root {
+  // 强制覆盖 Quartz 的默认字体栈变量
+  // 逻辑：在默认字体（如 Inter/Schibsted Grotesk）加载失败或遇到 Emoji 字符时，
+  // 回退到 Noto Color Emoji，最后是系统默认字体。
+  --bodyFont: "Inter", "Noto Color Emoji", sans-serif;
+  --headerFont: "Schibsted Grotesk", "Noto Color Emoji", sans-serif;
+  --codeFont: "IBM Plex Mono", "Noto Color Emoji", monospace;
+}
+
+// 针对特定可能出现 Emoji 的区域加强权重（可选）
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+li {
+  font-family: var(--headerFont); // 标题使用 headerFont
+}
+
+p,
+li,
+span {
+  font-family: var(--bodyFont); // 正文使用 bodyFont
+}
