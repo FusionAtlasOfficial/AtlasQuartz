@@ -145,7 +145,7 @@ export const sharedPageComponents: SharedLayout = {
         },
         {
           Component: Component.Links(
-            // 导航链接组件
+            // 导航链接组件1
             {
               links: {
                 首页: "/",
