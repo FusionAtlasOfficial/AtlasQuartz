@@ -148,11 +148,11 @@ export const sharedPageComponents: SharedLayout = {
             // 导航链接组件
             {
               links: {
-                首页: "/AtlasQuartz/",
-                最新内容: "/AtlasQuartz/正式发布页",
-                笔记杂项: "/AtlasQuartz/笔记杂项页",
-                开发日志: "/AtlasQuartz/网站开发日志",
-                关于: "/AtlasQuartz/关于我-AboutMe",
+                首页: "/",
+                最新内容: "/正式发布页",
+                笔记杂项: "/笔记杂项页",
+                开发日志: "/网站开发日志",
+                关于: "/关于我-AboutMe",
               },
             },
           ),
