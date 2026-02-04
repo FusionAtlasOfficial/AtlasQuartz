@@ -12,7 +12,12 @@
 
 ## 当前版本预览：
 
-<img src="/content/网站相关素材/Snipaste_2026-02-01_03-42-34.png" class="custom-id-001"/>
-<div align="center"><p style="color: #969696;"><i>桌面端显示效果</i></p></div>
-<img src="/content/网站相关素材/1769888661301.jpg" class="custom-id-002"/>
-<div align="center"><p style="color: #969696;"><i>移动端显示效果</i></p></div>
+<div align="center">
+<img src="/content/网站相关素材/Snipaste_2026-02-01_03-42-34.png" width="80%" style="border-radius: 12px; box-shadow: 0 0 5px rgba(0,0,0,0.2);" />
+<p style="color: #969696;"><i>桌面端显示效果</i></p>
+</div>
+
+<div align="center">
+<img src="/content/网站相关素材/1769888661301.jpg" width="300" style="border-radius: 12px; border: 1px solid #ddd;" />
+<p style="color: #969696;"><i>移动端显示效果</i></p>
+</div>

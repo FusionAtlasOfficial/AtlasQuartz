@@ -9,7 +9,7 @@ import * as Plugin from "./quartz/plugins"
 const config: QuartzConfig = {
   configuration: {
     pageTitle: "Cyber Atlantis",
-    pageTitleSuffix: "FusionAtlas",
+    pageTitleSuffix: " Fusion Atlas ",
     enableSPA: true,
     enablePopovers: true,
     analytics: { provider: "google", tagId: "YOUR-ID" },
