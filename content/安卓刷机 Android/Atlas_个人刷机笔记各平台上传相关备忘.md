@@ -7,7 +7,6 @@ title: 各平台上传相关备忘
 * 本文写作时严格遵循 Markdown 语法，好处是显而易见的，对于我这种强迫症来说，重逻辑的长文梳理本就困难，如果再加上排版，几乎就是要命的事情。
 * 想过封装为PDF格式，但PDF是固定分页的，我比较喜欢网页这样的流式排版
 * 可直接在Github下载.MD格式的原始 Markdown 文件，然后用任意支持的软件打开。
-  * 推荐用Chrome打开，搭配插件“Markdown Viewer”，可高度自定义显示方式。
 
 # 关于上传平台
 
@@ -15,8 +14,8 @@ title: 各平台上传相关备忘
 
 本文首发：
 
-* Github 个人仓库：[【The-Atlas-Knapsack】](https://github.com/FusionAtlasOfficial/The-Atlas-Knapsack/tree/main)
-  * 本文的目标是上传于多个平台，但不同平台的政策和偏好完全不同，不见得每个平台上都能上传完整内容，故 Github 上的版本为线上原始存档。
+* 个人网站：[【Cyber Atlantis】](https://atlasquartz.pages.dev/)
+  * 本文的目标是上传于多个平台，但不同平台的政策和偏好完全不同，不见得每个平台上都能上传完整内容，故个人网站的版本为线上原始存档。
 
 本文同步发布：
 
