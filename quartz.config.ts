@@ -39,7 +39,7 @@ const config: QuartzConfig = {
           secondary: "rgb(91, 194, 231) ", //链接颜色、当前图谱节点、主要高亮色
           tertiary: "rgb(255, 140, 66) ", // 链接悬停态 (Hover states)、已访问的图谱节点
           highlight: "rgba(50, 50, 50, 0.2) ", // 内部链接背景、代码行高亮背景
-          textHighlight: "rgb(162, 255, 0) ", // Markdown 语法标记的高亮背景
+          textHighlight: "rgb(80, 120, 0) ", // Markdown 语法标记的高亮背景
         },
         darkMode: {
           light: "rgb(22, 22, 22) ", //页面总背景色
