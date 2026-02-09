@@ -32,8 +32,9 @@ const sharedSidebarLeft = [
       // 备忘：如果你想显示 "coding/web/react.md"，你必须把 "coding", "web", "react" 都加进去，
       const whitelist = new Set([
         "安卓刷机-android", // 允许的文件夹 A
-        "atlas_个人刷机笔记_20260205", // 允许的具体文件 (不需要后缀)
+        "atlas_个人刷机笔记", // 允许的具体文件 (不需要后缀)
         "atlas_个人刷机笔记各平台上传相关备忘",
+        "android-系统-root-深度隐藏全链路实操手册-(2026-版)",
         "index", // 通常建议允许 index，否则根目录可能出问题
       ])
 

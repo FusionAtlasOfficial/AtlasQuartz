@@ -2,7 +2,7 @@
 title: 2026安卓救砖/刷机/备份入门知识超级汇总 & 小米12Pro刷机笔记
 ---
 
-> 目前文章更新版本：20260205
+> 目前文章更新版本：20260209
 
 # 关于上传平台
 
@@ -831,7 +831,7 @@ TWRP官方不一定支持所有安卓设备，甚至在2026年，相当多的新
 
 至此，我们又涉及到了一堆屎山代码......
 
-具体的操作细节在第三章：[3.4.1 刷入第三方Recovery（TWRP）](#341-刷入第三方recoverytwrp)
+具体的操作细节在第三章：[3.4.1 线刷第三方Recovery（TWRP） + 顺便获取 ROOT 权限](#341-线刷第三方recoverytwrp--顺便获取-root-权限)
 
 更多扩展内容详见：
 > TWRP官网说明，任意已适配的机型都有说明，如小米8：[适用于小米 8 的 TWRP](https://twrp.me/xiaomi/xiaomimi8.html)，但其原版使用说明并不一定适用于第三方TWRP，请自行分辨。
@@ -1407,6 +1407,7 @@ TWRP备份的内容总要有地方存放，它会在 `sdcard` 目录下生成一
 | 1号设备 | 安卓手机 | 小米 (Xiaomi) | Xiaomi 12 Pro 原野绿（素皮）8GB内存 256GB存储 | Xiaomi 12 Pro 国行版 | 2201122C | zeus | arm64-v8a | 当前主力机 |
 | 2号设备 | 安卓手机 | 小米 (Xiaomi) | Xiaomi 8 蓝色 6GB内存 64GB存储 | Xiaomi 8 全网通版 |  M1803E1A | dipper | arm64-v8a | 已退役/备用机 |
 | 3号设备 | 安卓电视 | 雷鸟 (FFALCON) | 雷鸟电视 Super 98 | 98S545C PRO |  “未知” | “未知” | arm64-v8a | / |
+| 4号设备 | 安卓手机 | 小米 (Xiaomi) | Xiaomi 9 SE 全息幻彩蓝 6GB内存 128GB存储 | Xiaomi 9 SE 全网通版 |  M1903F2A | grus | arm64-v8a | 购入二手机 |
 | ...... | ...... | ...... | ...... | ...... | ...... | ...... | ...... | ...... |
 
 ### 3.0.2 当前软件信息（刷机相关）
@@ -1415,8 +1416,9 @@ TWRP备份的内容总要有地方存放，它会在 `sdcard` 目录下生成一
 
 | 对应硬件编号 | BL锁 | Recovery | Recovery 版本号 | 操作系统 | 操作系统版本号 | 底层安卓大版本号 |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1号设备 | 已解 | 第三方（TWRP） | 3.7.0_12-Mi12Pro_v7.9_A13 | MIUI14 国行稳定版 | V14.0.18.0.TLBCNXM | 13.0 | zeus |
-| 2号设备 | 已解 | 第三方（TWRP） | ? | MIUI12 国行稳定版 | V12.0.3.0.QEACNXM |  10.0 | dipper |
+| 1号设备 | 已解 | 第三方（TWRP） | 3.7.0_12-Mi12Pro_v7.9_A13 | MIUI14 国行稳定版 | V14.0.18.0.TLBCNXM | 13.0 |
+| 2号设备 | 已解 | 第三方（TWRP） | twrp-3.7.0_9-0-dipper | MIUI12 国行稳定版 | V12.0.3.0.QEACNXM |  10.0 |
+| 4号设备 | 已解 | 第三方（TWRP） | twrp-3.7.0_9-0-grus | MIUI10 国行稳定版 | V10.3.3.0.PFBCNXM | 9.0 |
 | ...... | ...... | ...... | ...... | ...... | ...... | ...... |
 
 ### 3.0.3 刷机记录
@@ -1431,6 +1433,7 @@ TWRP备份的内容总要有地方存放，它会在 `sdcard` 目录下生成一
 | X-XX | ...... | ...... | ...... | ...... | ...... | ...... |
 | 2-02 | 2号设备 | 刷第三方Recovery | TWRP刷入测试 | twrp-3.4.0-10-dipper-mauronofrio | 正常使用 | **mauronofrio版 TWRP、正常使用** |
 | 2-01 | 2号设备 | 刷第三方Recovery | 能支持的最新TWRP | twrp-3.7.0_9-0-dipper | 正常使用 | 官方版 TWRP、当前正在使用的版本 |
+| 4-01 | 4号设备 | ? | ? | ? | ? | ? |
 | X-XX | ...... | ...... | ...... | ...... | ...... | ...... |
 | 未来规划 | 任意 | 刷系统 ROM | LineageOS | 待折腾 | 待实测 | 手头机型支持、XDA有现成的ROM包、教程完善 |
 
@@ -1632,52 +1635,81 @@ PC端建议记录备份归档路径。
 
 #### 3.4.1.1 安装 TWRP Recovery 步骤
 
-1. 首先设备需要进入 `bootloader` 模式：
-    * 设备开机状态下 USB 线连接PC，若弹出 USB 调试权限则设备端点击允许，然后在PC端打开ADB，输入 `adb reboot bootloader` 或者 `adb reboot fastboot` ，此时会直接重启到 fastboot。
-
-2. 重启后显示 “fastboot”，此时可输入 `fastboot devices` 验证ADB是否继续工作。
-    * 如果设备正确连接，ADB会输出 “序列号+fastboot” 的字段。
-
-3. 尝试直接刷入TWRP：
-    * ADB输入以下命令 `fastboot flash recovery <TWRP文件存放路径>` 。
-      * 如果PC端没有事先配置ADB环境，则需要在ADB安装文件夹下存放要拷入的文件，也需要在ADB安装文件夹下通过 CMD 或 PowerShell 打开ADB，若已经配置则随意了，详见上文：[3.3.2 可选操作：设置 ADB 到 Windows 环境变量](#332-可选操作设置-adb-到-windows-环境变量) 。
-    * 通常会显示：
-      > Sending 'recovery' (XXXXXX KB)                     OKAY [  X.XXXs]
-      > 
-      > Writing 'recovery'                                 OKAY [  X.XXXs]
-      > 
-      > Finished. Total time: X.XXXs
-
-      第一行的 `recovery` 若显示为 `recovery_X` 则是当前槽位，不是 `_a` 就是 `_b` ，可以在刷完后进入TWRP，手动选择另一个槽位，然后再次重启到 `FastBoot` 执行一遍以上命令，就可以在A/B槽位都刷入TWRP了。
-    * 然后需要输入 `fastboot reboot recovery` 手动重启至 recovery。
-    * 如果成功进入 TWRP 界面，则可直接进行第 5 步，不然则进行第 4 步。
-      * Xiaomi 12 Pro 实测此步骤可正常刷入。
-   
-4. 若直接刷入受阻（没重启到 TWRP 而是重启到系统了？作者用 Xiaomi 8 测试便是如此），此时我们尝试将 TWRP 刷入内存，暂时启动到 TWRP Recovery：
-    * 先重试前两步，也就是需要再次进入到 `bootloader` 模式。
-    * ADB输入：`fastboot boot <TWRP文件存放路径>`，按下回车键后，设备将直接自动重启至 TWRP 界面。
-      * 该步基本都不会出问题，就算后面无法固化，至少这种方式可以临时使用 TWRP 。    
-
-5. 设备启动进入 TWRP 后，需要先检查设备是否加密，如果已加密还非要继续操作，则只能格式化数据才能继续。
-
-6. 修补 BOOT 镜像：
-    * 将电脑上的 Magisk 文件粘贴到设备上（文件后缀若是.apk格式，文件拷贝至 `/sdcard` 目录前需要先改为.Zip，建议两个后缀的文件都各自拖入进来一份，以备后面步骤使用），TWRP 内点击 `安装` ➡️ 选择刚导入的 Magisk.Zip包。
-      * **重要！** 不修补 BOOT 镜像就无法固化 TWRP ，哪怕严格执行所有其他刷入流程，但只要以任何方式进入系统一次，TWRP 就可能被系统默认 Recovery 覆盖掉，所以安装 Magisk 和获取 ROOT 权限最好一并操作完。
-
-7.  TWRP 内的 Magisk 安装完毕后，开始尝试固化：
-    * 将电脑上的 TWRP 文件粘贴到设备上（.img格式文件直接拷贝至 `/sdcard` 目录），TWRP 内点击 `安装` ➡️ 选择 `安装镜像` ➡️ 点击刚导入的镜像文件 ➡️ 选择 recovery 分区 ➡️ 滑动确认刷机，切记安装好 TWRP 后，**不要** 立即点 `重启系统`，而是返回到 TWRP 首页。
-      * 若点击 `安装` 发现没有 recovery 分区，这是因为采用 A/B 分区方案的设备上，Recovery 被整合进了 Boot 分区，此时需要进入 高级 ➡️ 找到“安装recovery到内存（Install recovery Ramdisk）”选项，点击。
+1. **进入 Bootloader 模式**：  
+    * 设备开机状态下 USB 线连接PC，若弹出 USB 调试权限则设备端点击允许，然后在PC端打开ADB，输入 `adb devices`，如果设备正确连接，ADB会输出 “序列号+devices” 的字段。
+    * 输入 `adb reboot bootloader` 或者 `adb reboot fastboot` ，此时会直接重启到 fastboot。  
   
-8. 返回 TWRP 首页，点击 `重启` ，将设备重启至 Recovery，进入 TWRP 后再次点击 `重启` ，这回将设备重启至系统。
+2. **验证连接**：  
+    * 重启后显示 “fastboot”，此时可输入 `fastboot devices` 验证ADB是否继续工作。  
+    * 如果设备正确连接，ADB会输出 “序列号+fastboot” 的字段。  
 
-9. 系统内安装 Magisk ，以获取完整 ROOT 权限：
-    * 此时系统桌面应该能够找到 Magisk APP，击显示需要下载完整版，不用下载，如果之前第 6 步 拷入了 Magisk.apk 文件，直接安装即可（也可把.Zip后缀的Magisk改回.apk直接安装），安装完毕进入 Magisk 后，若提示完整安装则直接安装，没提示最好在其主界面手动点击完整安装。
-    * 完整安装完毕后在 Magisk 界面右上角点击 `重启` 按钮，选择重启至系统。
+3. **尝试直接刷入 TWRP**：  
+    * ADB输入以下命令 `fastboot flash recovery \<TWRP文件存放路径\> `。  
+      * 如果PC端没有事先配置ADB环境，则需要在ADB安装文件夹下存放要拷入的文件，也需要在ADB安装文件夹下通过 CMD 或 PowerShell 打开ADB，若已经配置则随意了，详见上文：[3.3.2 可选操作：设置 ADB 到 Windows 环境变量](#332-可选操作设置-adb-到-windows-环境变量)。  
+    * 通常会显示：
+      > Sending 'recovery' (XXXXXX KB) OKAY \[ X.XXXs\]
+      > 
+      > Writing 'recovery' OKAY \[ X.XXXs\]
+      > 
+      > Finished. Total time: X.XXXs  
 
-10. 验证固化是否成功：
-    * 手动关机，关机后手动进入 Recovery（小米是按住音量上键 + 电源键），如果直接进入 TWRP 就意味着 TWRP 已永久安装在我们的设备上。
+      第一行的 `recovery` 若显示为 `recovery\_X` 则是当前槽位，不是 `_a` 就是 `_b` ，可以在刷完后进入TWRP，手动选择另一个槽位，然后再次重启到 FastBoot 执行一遍以上命令，就可以在A/B槽位都刷入TWRP。   
+
+4. **刷入后手动重启或临时启动 (Boot)**：  
+    * **情况 A：刷入成功且无校验问题**  
+      * 输入 `fastboot reboot recovery` 手动重启至 recovery。如果成功进入 TWRP 界面，则可直接进行第 5 步。  
+      * *Xiaomi 12 Pro 实测此步骤可正常刷入。*  
+    * **情况 B：直接刷入受阻或找不到分区**  
+      * 若直接刷入无效（例如 A/B 分区机型找不到 recovery 分区），或者刷入后被官方强制覆盖。  
+      * 此时我们尝试将 TWRP 刷入内存，**临时启动**到 TWRP Recovery：  
+      * ADB输入：`fastboot boot \<TWRP文件存放路径\>`。
+      * 按下回车键后，设备将直接自动重启至 TWRP 界面。该步基本都不会出问题，至少这种方式可以让我们先临时用上 TWRP。  
+    * **情况 C：直接临时启动也失效**  
+      * 若情况B输入ADB后并没有自动重启至 TWRP，而是直接重启到了系统，则需要在步骤3之后直接按住电源键+音量上键约 10 秒钟手动重启进入恢复模式。
+      * **关键分支**：此时若无限重启/卡米/无法进入系统。则需要处理 AVB 2.0 启动校验问题。
+        * 此步骤对于带有 AVB 的机型至关重要（小米 9 SE 实测需要此步骤）。  
+        * **症状**：如果你在刷入 recovery 后，手动重启发现手机无限重启进入 TWRP，或者开机卡在 Logo 处，这通常是因为触发了 Android Verified Boot (AVB) 2.0 保护机制。系统检测到 Recovery 分区被修改，拒绝启动。  
+        * **解决方案**：此时需要刷入去除了校验的 vbmeta.img。  
+          1. 从你手机当前版本的**官方线刷包**中提取 vbmeta.img 文件。  
+          2. 在 Fastboot 模式下执行以下命令（注意参数不能少）： `fastboot \--disable-verity \--disable-verification flash vbmeta vbmeta.img` 
+          3. 执行完毕后，进入TWRP，尝试从TWRP中点击重启到系统，若依旧重启到了TWRP，则需要**格式化 Data 分区**，详见步骤5。  
+
+5. **处理数据分区加密 (Format Data)**：  
+    * 设备启动进入 TWRP 后，首先观察是否要求输入密码，或者查看内部存储文件名是否为乱码。  
+    * **重要决策点**：  
+      * 如果已加密且无法解密（或为了彻底解决无限重启回 Recovery 的问题），必须执行**格式化 Data 分区 (Format Data)**。  
+      * 操作路径：TWRP 首页 \-\> 清除 (Wipe) \-\> 格式化 Data (Format Data) \-\> 输入 yes。  
+      * *警告：此操作会清空手机内所有照片、应用和文件，请务必提前备份。*  
+      * 格式化完成后，**不要重启系统**，直接返回 TWRP 首页，继续下一步。  
+  
+6. **修补 BOOT 镜像 (防止 TWRP 被官方覆盖)**：  
+    * 将电脑上的 Magisk 文件粘贴到设备上（文件后缀若是.apk格式，文件拷贝至 `/sdcard` 目录前需要先改为.Zip，建议两个后缀的文件都各自拖入进来一份，以备后面步骤使用）。
+    * TWRP 内点击 `安装` ➡️ 选择刚导入的 Magisk.Zip包。  
+    * **重要！** 官方系统在检测到 Boot 分区完整时，会在首次启动时自动恢复官方 Recovery。通过刷入 Magisk 修补 Boot 镜像，可以破坏这个校验机制，从而实现 TWRP 的“固化”。  
+
+7. **TWRP 的最终固化 (针对 A/B 分区或特殊机型)**：  
+    * 如果你是通过 fastboot boot (临时启动) 进来的，或者想确保万无一失：  
+    * 将电脑上的 TWRP 文件粘贴到设备上（.img格式文件直接拷贝至 `/sdcard` 目录）。  
+    * TWRP 内点击 安装 ➡️ 选择 安装镜像 ➡️ 点击刚导入的镜像文件 ➡️ 选择 recovery 分区 ➡️ 滑动确认刷机。  
+      * 若点击 安装 发现没有 recovery 分区（A/B 分区机型），点击 高级 ➡️ 找到“安装 recovery 到内存（Install recovery Ramdisk）”选项，点击并刷入 TWRP 镜像。  
+    * 切记安装好 TWRP 后，**不要** 立即点 重启系统，而是返回到 TWRP 首页。  
+  
+8. **重启系统**：  
+    * 返回 TWRP 首页，点击 重启 ，选择 重启到系统 (System)。  
+    * 如果此前执行了格式化 Data，第一次开机时间会比较长，请耐心等待。  
+  
+9.  **系统内完善 Root 环境**：  
+    * 进入系统后，找到 Magisk APP。如果图标显示不全或无法打开，安装之前拷贝进去的 Magisk.apk。  
+    * 进入 Magisk 后，若提示“需要修复运行环境”或“完整安装”，点击确定并选择“直接安装（推荐）”。  
+    * 安装完毕后，点击 Magisk 界面右上角的 重启 按钮。  
+
+10. **验证固化是否成功**：  
+    * 手动关机。  
+    * 关机后手动进入 Recovery（小米通常是按住 **音量上键 \+ 电源键**，出现 Logo 后松开电源键，保持按住音量上键）。  
+    * 如果直接进入 TWRP 界面，意味着 TWRP 已永久植入在我们的设备上，且拥有了完整的 ROOT 权限。
 
 > 更多实操参考来源：[2025 年如何在安卓手机上安装 TWRP Recovery](https://www.youtube.com/watch?v=-dDnH5AvEzY)
+> XDA论坛教程帖：[如何在小米 9 SE 上刷入 TWRP 和 GSI ROM](https://xdaforums.com/t/guide-grus-how-to-flash-twrp-and-gsi-roms-on-mi-9-se.3939254/)
 
 #### 3.4.1.2 小米 12 Pro 刷入 TWRP 备忘 + 疑难杂症记录
 
