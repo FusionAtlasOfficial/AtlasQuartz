@@ -993,9 +993,17 @@ header .avatar-container {
 // 模块 10: 交互体验增强 (Interactions)
 // ==========================================================================
 
-/* 10.1 全局平滑滚动 */
+/* 10.1 全局平滑滚动+偏移补偿: 为所有标题设置统一的滚动偏移量，让点击页内链接和目录的跳转位置正常。*/
 html {
   scroll-behavior: smooth;
+}
+article > h1,
+article > h2,
+article > h3,
+article > h4,
+article > h5,
+article > h6 {
+  scroll-margin-top: 6rem !important;
 }
 
 /* 10.2 回到顶部链接样式优化 (Footer) */
