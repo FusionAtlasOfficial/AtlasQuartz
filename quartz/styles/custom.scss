@@ -1,6 +1,20 @@
 @use "./base.scss"; // 引入 Quartz 基础样式表
 
 // ==========================================================================
+// 注释目录
+// 模块 1: 全局颜色与主题强制 (Colors & Theme)
+// 模块 2: 大组件基本定义
+// 模块 3: 全局顶部导航栏（Global Header）（页眉）
+// 模块 4: 页面主容器 (.page)
+// 模块 5: 左侧边栏 (.Left)
+// 模块 6: 中间内容区 (.Center)
+// 模块 7: 右侧边栏 (.Right)
+// 模块 8: 脚注（Footnotes）与页脚栏（footer）
+// 模块 9: 针对移动端优化
+// 模块 10: 交互体验增强 (Interactions)
+// ==========================================================================
+
+// ==========================================================================
 // 模块 1: 全局颜色与主题强制 (Colors & Theme)
 // 目标: 无论系统设置如何，强制锁定为暗色模式
 // ==========================================================================
@@ -81,7 +95,7 @@ body::before {
     rgba(0, 120, 210, 0) 75%
   );
 
-  animation: fluid-flow-primary 45s infinite linear; /*动画总循环时常*/
+  animation: fluid-flow-primary 25s infinite linear; /*动画总循环时常*/
 }
 
 /* === 橙色光斑本体 === */
@@ -96,7 +110,7 @@ body::after {
     rgba(255, 140, 66, 0) 75%
   );
 
-  animation: fluid-flow-secondary 45s infinite linear; /*动画总循环时常*/
+  animation: fluid-flow-secondary 25s infinite linear; /*动画总循环时常*/
 }
 
 /* === 蓝色光斑 动画 === */
@@ -511,6 +525,43 @@ header .flex-component > div:nth-child(3)::before  /* 第二个垂直分割线 *
   }
 }
 
+/* === 5.5 左侧边栏 (Explorer) 列表视觉优化 === */
+.explorer ul li {
+  // 1. 差异化间距控制
+  // 默认不设置底部边距（保持文件夹收紧）
+  margin-bottom: 0;
+
+  // 针对“文件”条目（即不包含文件夹切换按钮的 li）增加物理隔离
+  &:not(:has(button)) {
+    margin-bottom: 0.6rem !important;
+  }
+
+  a {
+    // 2. 内部收缩：收紧文件标题因过长换行时的内部行高
+    line-height: 1.3 !important;
+
+    // 3. 强制截断：限制最多显示 2 行，超出显示省略号
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; /* 标准属性消除兼容性警告 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    // 4. 交互补偿：鼠标悬浮时展示完整标题
+    &:hover {
+      color: var(--tertiary); /* 悬停高亮 */
+      -webkit-line-clamp: unset;
+      line-clamp: unset; /* 标准属性消除兼容性警告 */
+    }
+  }
+}
+
+// 补偿：确保文件夹按钮本身的行高不被干扰
+.explorer button {
+  line-height: inherit;
+}
+
 // ==========================================================================
 // 模块 6: 中间内容区 (.Center)
 // ==========================================================================
@@ -663,7 +714,7 @@ pre:hover > code {
 }
 
 // ==========================================================================
-// // 模块 8: 脚注（Footnotes）与页脚栏（footer）
+// 模块 8: 脚注（Footnotes）与页脚栏（footer）
 // ==========================================================================
 
 /* 8.1. 隐藏原始的 Footnotes 英文 */
@@ -993,7 +1044,7 @@ header .avatar-container {
 // 模块 10: 交互体验增强 (Interactions)
 // ==========================================================================
 
-/* 10.1 全局平滑滚动+偏移补偿: 为所有标题设置统一的滚动偏移量，让点击页内链接和目录的跳转位置正常。*/
+/* 全局平滑滚动+偏移补偿: 为所有标题设置统一的滚动偏移量，让点击页内链接和目录的跳转位置正常。*/
 html {
   scroll-behavior: smooth;
 }
@@ -1006,23 +1057,7 @@ article > h6 {
   scroll-margin-top: 6rem !important;
 }
 
-/* 10.2 回到顶部链接样式优化 (Footer) */
-footer .back-to-top {
-  cursor: pointer;
-  text-decoration: none;
-  font-weight: 600;
-  transition:
-    transform 0.2s ease,
-    color 0.2s ease;
-  display: inline-block;
-
-  &:hover {
-    color: var(--tertiary); /* 使用主题色 */
-  }
-}
-
-/* 10.3 首页卡片优化 */
-/* 仅在首页生效 */
+/* 首页卡片优化、仅在首页生效 */
 [data-slug="index"] .page .article {
   display: flex;
   flex-direction: column;

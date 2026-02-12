@@ -26,11 +26,6 @@ export default ((_opts?: Options) => {
         <p>
           「 <a href="https://github.com/jackyzha0/quartz">联系我</a> 」
         </p>
-
-        {/* 第四行 */}
-        <p>
-          「 <a href="#" class="back-to-top">回到顶部</a> 」
-        </p>
       </footer>
     )
   }

@@ -211,6 +211,7 @@ export const defaultContentPageLayout: PageLayout = {
       // 这里的 "正式发布页" 需对应 MD 文件的文件名（slug）
       condition: (page) => page.fileData.slug === "关于我-AboutMe",
     }),
+    Component.BackToTop(), // 新增组件：注入浮动按钮
   ],
   left: sharedSidebarLeft, // <--- 引用提取的公共变量
   right: [
@@ -222,7 +223,12 @@ export const defaultContentPageLayout: PageLayout = {
 
 // 列表页（标签页等）特有：左边栏显示文件树，右边栏通常留空或放简单组件
 export const defaultListPageLayout: PageLayout = {
-  beforeBody: [Component.Breadcrumbs(), Component.ArticleTitle(), Component.ContentMeta()],
+  beforeBody: [
+    Component.Breadcrumbs(),
+    Component.ArticleTitle(),
+    Component.ContentMeta(),
+    Component.BackToTop(), // 新增组件：注入浮动按钮
+  ],
   left: sharedSidebarLeft, // <--- 引用提取的公共变量
   right: [],
 }
