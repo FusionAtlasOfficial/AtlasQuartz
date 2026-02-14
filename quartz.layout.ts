@@ -66,7 +66,7 @@ const sharedSidebarLeft = [
         "协助测试清单",
       ])
       // 隐藏文件夹
-      const hideFolders = new Set(["安卓刷机-android"])
+      const hideFolders = new Set(["安卓刷机-android", "笔记杂项"])
 
       // 2. 如果是文件夹，按文件夹黑名单过滤
       if (node.isFolder) {
