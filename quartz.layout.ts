@@ -66,7 +66,7 @@ const sharedSidebarLeft = [
         "协助测试清单",
       ])
       // 隐藏文件夹
-      const hideFolders = new Set(["安卓刷机-android", "笔记杂项"])
+      const hideFolders = new Set(["安卓刷机-android", "笔记杂项", "atlasprivate"])
 
       // 2. 如果是文件夹，按文件夹黑名单过滤
       if (node.isFolder) {
@@ -208,8 +208,14 @@ export const defaultContentPageLayout: PageLayout = {
     }),
     Component.ConditionalRender({
       component: Component.LinkCardsAboutMe(),
-      // 这里的 "正式发布页" 需对应 MD 文件的文件名（slug）
-      condition: (page) => page.fileData.slug === "关于我-AboutMe",
+      // 在任何 Markdown 文件的开头（YAML 区）通过一个自定义字段来决定是否启用 Link！组件
+      // 需要在想显示卡片的 Markdown 文件顶部添加 enableCards: true（目前是在"Atlas简历.md"中）
+      condition: (page) => {
+        // 逻辑：如果 slug 匹配，或者 Frontmatter 中 enableCards 为 true，则渲染
+        const isAboutMe = page.fileData.slug === "关于我-AboutMe"
+        const hasEnabled = page.fileData.frontmatter?.enableCards === true
+        return isAboutMe || hasEnabled
+      },
     }),
     Component.BackToTop(), // 新增组件：注入浮动按钮
   ],
