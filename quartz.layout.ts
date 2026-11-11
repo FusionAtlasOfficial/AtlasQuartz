@@ -175,13 +175,8 @@ export const sharedPageComponents: SharedLayout = {
   ],
   // ==========================
   afterBody: [
-    Component.Signature(
-      // 签名
-      {
-        text: "本站可随意转载，但请注明出处。\nFusion Atlas © 2026. All Rights Reserved.   ", // 签名文本
-        cssClass: "secondary-text", // 必须传入自定义类名，不如会和header的.Signature冲突
-      },
-    ),
+    // 定制签名，统一由该组件处理全局及私密签名。
+    Component.CustomAfterBody(),
   ],
   footer: Component.Footer(),
 }
