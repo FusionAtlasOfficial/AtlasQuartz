@@ -1038,6 +1038,17 @@ header .avatar-container {
       opacity: 0.4;
     }
   }
+
+  /* 9.10. 补偿移动端双行吸顶 Header 的实际高度，避免页内锚点被遮挡 */
+  article h1,
+  article h2,
+  article h3,
+  article h4,
+  article h5,
+  article h6,
+  [id] {
+    scroll-margin-top: 11.5rem !important; // 按移动端 Header 实际高度 + 留白微调（建议 9.5rem ~ 11.5rem）
+  }
 }
 
 // ==========================================================================
